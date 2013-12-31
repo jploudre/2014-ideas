@@ -4600,6 +4600,7 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 
 ;-----------------------------------------------------------------
 
+/*
 
 ::freqy::frequently
 ::incid::incidentally
@@ -5594,6 +5595,9 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::nathx::natural history 
 ::unreld::unrelated
 ::conty::continuity
+
+*/
+
 ; Here are new abbreviations or ones that don't log as easily (programatic)
 ::cdn::
 SendInput Call Doctor Note:{Enter 2}SITUATION:{Enter 3}BACKGROUND:{Enter 3}ASSESSMENT:{Enter 3}RECOMENDATION:{Enter 2}{Up 10}
