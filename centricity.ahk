@@ -14,8 +14,12 @@ return
 `::
 IfWinExist, Update
 WinActivate, Update
-else
-	Click, 13, 745
+IfWinNotExist, Update
+{
+	WinGetPos,,,,winheight,A
+	ypos := winheight - 161
+	Click, 13, %ypos%
+}
 return
 
 #IfWinActive
