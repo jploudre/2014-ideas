@@ -170,11 +170,11 @@ AddQTfromCSV(ByRef CSVfile)
 			}	
 		}
 	Click, 335, 176
-	Send %abbreviation%
+	Sendraw %abbreviation%
 	Sleep 100
 	Send {tab}
 	Sleep 100
-	Send %expansion%
+	Sendraw %expansion%
 	Sleep 100
 	Click, 673, 234
 	Sleep 1000
