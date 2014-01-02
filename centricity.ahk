@@ -184,3 +184,39 @@ AddQTfromCSV(ByRef CSVfile)
 	return ; not in preferences window
 	}
 }
+
+Clip(Text="", Reselect="") ; http://www.autohotkey.com/forum/viewtopic.php?p=467710 , modified August 2012
+{
+	Static BackUpClip, Stored, LastClip
+	If (A_ThisLabel = A_ThisFunc) {
+		If (Clipboard == LastClip)
+			Clipboard := BackUpClip
+		BackUpClip := LastClip := Stored := ""
+	} Else {
+		If !Stored {
+			Stored := True
+			BackUpClip := ClipboardAll
+		} Else
+			SetTimer, %A_ThisFunc%, Off
+		LongCopy := A_TickCount, Clipboard := "", LongCopy -= A_TickCount
+		If (Text = "") {
+			Send, ^c
+			ClipWait, LongCopy ? 0.5 : 0.25
+		} Else {
+			Clipboard := LastClip := Text
+			ClipWait, 10
+			Send, ^v
+		}
+		SetTimer, %A_ThisFunc%, -700
+		If (Text = "")
+			Return LastClip := Clipboard
+		Else If (ReSelect = True) or (Reselect and (StrLen(Text) < 3000)) {
+			Sleep 30
+			StringReplace, Text, Text, `r, , All
+			SendInput, % "{Shift Down}{Left " StrLen(Text) "}{Shift Up}"
+		}
+	}
+	Return
+	Clip:
+	Return Clip()
+}
