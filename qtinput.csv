@@ -1,1 +1,802 @@
-
+Abd,Abdominal 
+Abnl,Abnormal
+Abnly,Abnormality
+Abnlys,Abnormalities
+Abt,About
+Abx,Antibiotics
+Acu,Acute
+Acuy,Acutely
+Addn,Addition
+Addnl,Additional
+Adep,Antidepressant
+Adeps,Antidepressants
+Adeq,Adequate
+Afib,Atrial fibrillation
+Agn,Again
+Albu,Albuterol
+Aldy,Already
+Alpraz,Alprazolam
+Amap,As much as possible
+Amitr,Amitriptyline
+Amox,Amoxicillin
+Antic,Anticipate
+Anticd,Anticipated
+Anticg,Anticipating
+Anticn,Anticipation
+Anticoag,Anticoagulate
+Anticoagd,Anticoagulated
+Anticoagg,Anticoagulating
+Anticoagn,Anticoagulation
+Anticoags,Anticoagulates
+Antics,Anticipates
+Anticy,Anticipatory
+Anx,Anxious
+Anxy,Anxiety
+Approp,Appropriate
+Appropy,Appropriately
+Approx,Approximate
+Approxy,Approximately
+Appt,Appointment
+Appts,Appointments
+Assc,Asymptomatic
+Assoc,Associate
+Assocd,Associated
+Assocg,Associating
+Assocn,Association
+Assocs,Associates
+Aten,Atenolol
+Att,At that time
+Attt,At that time
+Avail,Available
+Aw,Associated with
+Azith,Azithromycin
+B4,Before
+B4d,Beforehand
+Bc,Because
+Bdnowr,I think benefits **do not** outweigh the risks in this patient.
+Behav,Behavior
+Benzo,Benzodiazepine
+Benzos,Benzodiazepines
+Bgn,Begin
+Bgng,Beginning
+Bgns,Begins
+Bham,Bellingham
+Bhv,Behavior
+Bhvy,Behaviorally
+Bilat,Bilateral
+Bilaty,Bilaterally
+Bili,Bilirubin
+Bn,Been
+Bowr,I think benefits outweigh the risks in this patient.
+Bp,Blood pressure
+Bpmed,Blood pressure medication
+Bps,Blood pressures
+Bt,But
+Bw,Better with
+Bx,Biopsy
+Bx,Biopsy
+Bxd,Biopsied
+C/s,Cesarian section
+C/w,Consistent with
+Callfu,Patient will call us to update status
+Cards,Cardiology
+Cardt,Cardiologist
+Ccs,Corticosteroid
+Ccsi,Corticosteroid injection
+Cd,Could
+Chemo,Chemotherapy
+Chiro,Chiropracter
+Chron,Chronic
+Chrony,Chronically
+Ck,Check
+Ckd,Checked
+Ckg,Checking
+Cks,Checks
+Cl,Call
+Cld,Called
+Clg,Calling
+Clinip,Call if not improving
+Clinip,Call if not improving.
+Clonaz,Clonazepam
+Cm,Come
+Cn,Can
+Comb,Combine
+Combd,Combined
+Combg,Combining
+Combn,Combination
+Combns,Combinations
+Combo,Combination
+Combos,Combinations
+Combs,Combines
+Comor,Comorbid
+Comory,Comorbidity
+Confu,Confuse
+Confud,Confused
+Confug,Confusing
+Confun,Confusion
+Confus,Confuses
+Cont,Continue
+Contd,Continued
+Contemp,Contemplative
+Contg,Continuing
+Contn,Continuation
+Contrib,Contribute
+Contribd,Contributed
+Contribg,Contributing
+Contribn,Contribution
+Contribs,Contributes
+Contriby,Contributory
+Conts,Continues
+Conty,Continuity
+Cryo,Cryotherapy
+Ctx,Contractions
+Cv,Cardiovascular
+Cw,Consistent with
+Cx,Culture
+Cxr,Chest x-ray
+Cyp,Could you please
+Cypn,Could you please tell patient everything was normal.
+D/o,Disorder
+Dadep,"Discussed antidepressants, time course of effects & side effects. Discussed titration, when to call."
+Dbpcard,Discussed blood pressure self-monintoring and recording.
+Dc,Discontinue
+Dccst,"Discussed issues around corticosteroid topicals, efficacy, length of use versus potency, risks."
+Dcd,Discontinued
+Dcg,Discontinuing
+Dcn,Discontinuation
+Dcpe,Will discuss these labs at the patient's upcoming preventative exam.
+Dcv,"Discussed cardiovascular major risk factors, reasons to get evaluated emergently, risk factor modification."
+Dd,Did
+Dddx,Discussed differential diagnosis with patient.
+Ddm,Discussed using high-dose dextromethorphan (60mg) for cough.
+Ddoubt,Discussed my doubts that the symptoms are clinically significant.
+Ddx,Differential diagnosis
+Ddxe,Differential diagnosis excludes
+Ddxi,Differential diagnosis includes
+Decr,Decrease
+Decrd,Decreased
+Decrg,Decreasing
+Derm,Dermatology
+Dermt,Dermatologist
+Dermun,Dermoscopically unremarkable.
+Deval,Discussed plan for testing to evaluate for diagnosis.
+Devel,Develop
+Develd,Developed
+Develg,Developing
+Devels,Develops
+Develt,Development
+Dexam,Discussed pertinent findings of physical exam today.
+Dexcercise,Discussed importance of exercise/lifestyle activity. Ways to increase.
+Dfenofibrate,Discussed studies about fenofibrate in diabetics pros/cons.
+Dfever,Discussed importance of fever control and how to manage with OTC medications.
+Dflonase,Discussed and demonstrated use of nasal corticosteroids.
+Dflutx,"Discussed plan of controlling fever (tylenol and ibuprofen), hydrating, staying home."
+Dfu,Discussed/Encouraged routine follow up.
+Dglucose,"Discussed significance (cardiovascular, potential diabetes) and monitoring for glucose intolerance."
+Dherbal,Discussed botanical options for symptom control.
+Dholdabx,Prescribed antibiotics but a plan to hold and monitor symptoms for now.
+Dholdmed,Discussed a trial of holding a medication for a few weeks and monitoring for potential side effect.
+Dhomeosa,"Patient will check with family if she snores, gasps, chokes or stops breathing at nighttime."
+Dhscrp,Discussed studies about heart disease and elevated waistline. Check hsCRP and discussed role of statin for heart disease prevention. The most recent study was with Rosuvastatin -- I suspect Simvastatin would have similar effect with better cost effectiveness.
+Diff,Different
+Diffe,Difference
+Dinjn,"Discussed usual issues around corticosteroid injections (risk for flare, time course, warning signs for infection, etc)."
+Dispo,Disposition
+Dist,Distant
+Diste,Distance
+Distrib,Distribute
+Distribd,Distributed
+Distribg,Distributing
+Distribn,Distribution
+Distribs,Distributes
+Dists,Disances
+Disty,Distantly
+Dlab,Reviewed labs with patient and discussed significance.
+Dlk,"D. Kutzke, ARNP"
+Dly,Daily
+Dm,Diabetes
+Dmedtitr,Discussed the possibility of the patient doing a self-titration of the medication.
+Dmelox,Discussed the use of meloxiam for inflammation (chosen for dosing simplicity.)
+Dnh,Discussed usual natural history of this problem.
+Dnoflut,"Although symptoms overlap with influenza, I do not think testing necessary."
+Dnopsa,"Discussed pros/cons of PSA testing and prostate cancer screening. After discussion, patient opted against lab screening."
+Dnpt,Discussed self-testing (Nocturnal Penile Tumescence) and significance of results for differentiating between psychogenic and organic erectile dysfunction.
+Dnsaid,Discussed use of anti-inflammatories such as ibuprofen and naproxen. 
+Doc,Doctor
+Docu,Document
+Docud,Documented
+Docug,Documenting
+Docun,Documentation
+Docus,Documents
+Dopiate,Discussed value/usage of opiates for pain relief.
+Dosa,"Discussed the significance of obstructive sleep apnea (including cardiovascular risks, bidirectional effect with weight, lifestyle benefits of treatment). Explained the general process of evaluation and common troubles with compliance."
+Dotc,Discussed how to use OTC medications to help alleviate symptoms.
+Dpc,Discussed pros/cons of
+Dpd,Depend
+Dpdd,Depended
+Dpdg,Depending
+Dpds,Depends
+Dpedfever,"Discussed fever management in children, dosing of medications, alternating ibuprofen and tylenol."
+Dpedsleep,"Discussed pediatric sleep issues, consider/use melatonin (pros/cons), role of sleep in development (behaviorally, mental health, etc)."
+Dpolypill,Discussed the polypill studies as an introduction to cardiovascular issues.
+Dpsa,Discussed pros/cons of PSA testing and prostate cancer screening.
+Dref,Discussed reasons for referral.
+Dreturn,Discussed reasons to return to clinic for recheck.
+Drexam,Discussed reassuring aspects of physical exam.
+Drf,Discussed warning signs to watch for and when to be re-evaluated.
+Drtc,Discussed reasons for returning to clinic.
+Ds,Discuss
+Dsal,Discussed and demonstrated use of saline sinus lavage for symptom reduction.
+Dsd,Discussed
+Dsdc,Discussed a trial of medication discontinuation and careful monitoring for symptom recurrence.
+Dsdm,Discuss at upcoming diabetic follow up visit.
+Dse,Discussed common side effects of medication.
+Dselflimit,Anticipate this will be self-limiting.
+Dsg,Discussing
+Dsleep,Discussed recent studies about sleep and long-term cardiovascular health.
+Dsm,Discussed side effects of 
+Dsn,Discussion
+Dssc,Discussed doing symptomatic treatment and monitor for now.
+Dstat,"Discussed statin medications, pros/cons, side effects."
+Dterbinafine,"Discussed pros/cons of terbinafine. Reviewed cost, lab monitoring prior to use, problems with definitive diagnosis (KOH unreliable, Culture slow), risk for recurrence. If CMP OK, will start prescription."
+Dtitrmed,Discussed the possibility of the patient doing a self-titration of the medication. 
+Dtlc,Discussed conservative self-care measures.
+Dutd,Discussed research/evidence based on UpToDate review.
+Duv,Discuss at upcoming visit.
+Dwarn,Discussed warning signs to watch for.
+Dweight,Discussed issues around weight and weight loss options.
+Dwgtl,Discussed the significance of weight loss for this patient's health
+Dww,Discussed watchful waiting approach. Patient agrees after discussion.
+Dx,Diagnosis
+Dxc,Diagnostic
+Dxd,Diagnosed
+Dxg,Diagnosing
+Dxr,Discussed the findings on the x-ray from today.
+Dxs,Diagnoses
+Dysfxn,Dysfunction
+Dysfxnl,Dysfunctional 
+Dz,Disease
+Ea,Each
+Eff,Effect
+Effd,Effected
+Effg,Effecting
+Effs,Effects
+Effv,Effective
+Effy,Efficacy
+Elev,Elevate
+Elevd,Elevated
+Elevg,Elevating
+Elevn,Elevation
+Elevns,Elevations
+Elevs,Elevates
+Elim,Eliminate
+Elimd,Eliminated
+Elimg,Eliminating
+Elimn,Elimination
+Elims,Elininates
+Emds,E-MDs
+Endo,Endocrinology
+Endot,Endocrinologist
+Ent,Otolaryngology
+Entt,ENT doc
+Epi,Episode
+Epis,Episodes
+Epw,Explored patient willingness.
+Esi,Epidural steroid injection
+Esp,Especially
+Estab,Establish
+Estabd,Established
+Estabg,Establishing
+Eti,Etiology
+Euvu,Elongated uvula
+Eval,Evaluate
+Evald,Evaluated
+Evalg,Evaluating
+Evaln,Evaluation
+Evaln,Evaluation
+Evid,Evidence
+Exac,Exacerbate
+Exacd,Exacerbated
+Exacg,Exacerbating
+Exacn,Exacerbation
+Exacn,Exacerbation
+Exacs,Exacerbates
+Excl,Exclude
+Exclg,Excluding
+Exclg,Excluding
+Excls,Excludes
+Exer,Exercise
+Fam,Family
+Famhx,Family history
+Flon,Flonase
+Fluox,Fluoxetine
+Fm,From
+Fnd,Find
+Fr,For
+Freq,Frequent
+Freqy,Frequently
+Fst,First
+Fu,Follow up
+Fu10d,Follow up in 10 days
+Fu10m,Follow up in 10 months
+Fu10w,Follow up in 10 weeks
+Fu11m,Follow up in 11 months
+Fu12m,Follow up in 12 months
+Fu1d,Follow up in 1 day
+Fu1m,Follow up in 1 month
+Fu1w,Follow up in 1 week
+Fu1y,Follow up in 1 year
+Fu2d,Follow up in 2 days
+Fu2m,Follow up in 2 months
+Fu2w,Follow up in 2 weeks
+Fu3d,Follow up in 3 days
+Fu3m,Follow up in 3 months
+Fu3w,Follow up in 3 weeks
+Fu4d,Follow up in 4 days
+Fu4m,Follow up in 4 months
+Fu4w,Follow up in 4 weeks
+Fu5d,Follow up in 5 days
+Fu5m,Follow up in 5 months
+Fu5w,Follow up in 5 weeks
+Fu6d,Follow up in 6 days
+Fu6m,Follow up in 6 months
+Fu6w,Follow up in 6 weeks
+Fu7d,Follow up in 7 days
+Fu7m,Follow up in 7 months
+Fu7w,Follow up in 7 weeks
+Fu8d,Follow up in 8 days
+Fu8m,Follow up in 8 months
+Fu8w,Follow up in 8 weeks
+Fu9d,Follow up in 9 Days
+Fu9m,Follow up in 9 months
+Fu9w,Follow up in 9 weeks
+Fud,Followed up
+Fug,Following up
+Fuinip,Follow up if not improving.
+Fuiw,Follow up if worsening.
+Funm,Follow up next month
+Funw,Follow up next week
+Funy,Follow up next year
+Fuprn,Follow up as needed.
+Fus,Follows up
+Fx,Side effects
+Fxd,Faxed
+Fxg,Faxing
+Fxn,Function
+Fxn,Function
+Fxnd,Functioned
+Fxng,Functioning
+Fxnl,Functional
+Fxnl,Functional
+Fxns,Functions
+Gen,General
+Geny,Generally
+Gi,Gastroenterology
+Git,Gastroenterologist
+Glui,Glucose intolerance
+Gluin,Glucose intolerance
+Glyb,Glyburide
+Gt,Get
+Gyn,Gynecology
+Gynt,Gynecologist
+Hbpw,Hope for the best but the prepare for worst.
+Hd,Had
+Heme,Hematology
+Hemet,Hematologist
+Hosp,Hospital
+Hospd,Hospitalized
+Hospn,Hospitalization
+Hospns,Hospitalizations
+Htn,Hypertension
+Hv,Have
+Hx,History
+Hxo,History of
+Ibu,Ibuprofen
+Im,Improve
+Imd,Improved
+Img,Improving
+Immed,Immediate
+Immedy,Immediately
+Impr,Improve
+Imprd,Improved
+Imprg,Improving
+Imprn,Improvement
+Imprs,Improves
+Imprt,Improvement
+Ims,Improves
+Imt,Improvement
+Inad,Inadequate
+Inady,Inadequately
+Inapprop,Inappropriate 
+Incid,Incidentally
+Incl,Include
+Incld,Included
+Incle,Inclusive
+Inclg,Including
+Incls,Includes
+Incr,Increase
+Incrd,Increased
+Incrg,Increasing
+Incrs,Increases
+Ineff,Ineffective
+Ineffv,Ineffective
+Inf,Inform
+Infd,Informed
+Infg,Informing
+Infn,Information
+Inie,If not effective
+Inip,If not improving
+Init,Initial
+Initd,Initiated
+Initg,Initiating
+Initn,Initiation
+Inits,Initiates
+Initv,Initiative
+Inity,Initially
+Inj,Inject
+Injd,Injected
+Injg,Injecting
+Injn,Injection
+Injns,Injections
+Injs,Injects
+Innl,Please inform patient results are normal.
+Insl,Please inform patient results are stable. 
+Intermit,Intermittent
+Intermity,Intermittently
+Intk,Intake
+Intol,Intolerable
+Intols,Intolerable side effects
+Irreg,Irregular
+Irregy,Irregularly
+Lisin,Lisinopril
+Lk,Like
+Lmom,Left message on voicemail.
+Loraz,Lorazepam
+Lova,Lovastatin
+Lsg,Longstanding
+Max,Maximum
+Med,Medication
+Medhx,Medical history
+Meds,Medications
+Melox,Meloxicam
+Metf,Metformin
+Metop,Metoprolol
+Mhx,Medical history
+Min,Minimal
+Miny,Minimally
+Mk,Make
+Mkappt,Please make follow up appointment for
+Mm,Muscle
+Mms,Muscles
+Mng,Manage
+Mngd,Managed
+Mngg,Managing
+Mngs,Manages
+Mngt,Management
+Mntr,Monitor
+Mntrd,Monitored
+Mntrg,Monitoring
+Mntrs,Monitors
+Mod,Moderate
+Modd,Moderated
+Modg,Moderating
+Modn,Moderation
+Mods,Moderates
+Mody,Moderately
+Mr,More
+Mult,Multiple
+Mxd,Dr. M. Dubek
+Nad,And
+Nathx,Natural history 
+Nbr,Number
+Nebs,Nebulizer
+Nec,Necessary
+Neg,Negative
+Nephro,Nephrology
+Nephrot,Nephrologist
+Neuro,Neurology
+Neurot,Neurologist
+Nfy,Notify
+Nh1w,Anticipate better in 1 week.
+Nh2w,Anticipate better in 2 weeks.
+Nh3w,Anticipate better in 3 weeks.
+Nh4w,Anticipate better in 4 weeks.
+Nh5w,Anticipate better in 5 weeks.
+Nh6w,Anticipate better in 6 weeks.
+Nhsd,Anticipate better in the next several days.
+Nl,Normal
+Nly,Normally
+Noinj,No injury or trauma.
+Noncontemp,Non-contemplative
+Nt,Not
+Nty,Notify
+Ntyd,Notified
+Ntyg,Notifying
+Nw,Now
+O/w,Otherwise
+Obv,Obvious
+Obvy,Obviously
+Occ,Occasional
+Occy,Occasionally
+Omep,Omeprazole
+Onco,Oncology
+Oncot,Oncologist
+Orig,Original
+Origy,Originally
+Ortho,Orthopedics
+Orthot,Orthopedist
+Osa,Obstructive sleep apnea
+Otr,Other
+Outpt,Outpatient
+Pau,Patient alert updated.
+Pcp,Personal physician
+Pcwp,Please clarify with patient.
+Perc,Percocet
+Pht,Physical therapy
+Pht,Physical therapy
+Phu,History updated in EMR.
+Pls,Please
+Pmed,Pain medication
+Pna,Pneumonia
+Pnd,Post-nasal drip
+Podt,Podiatrist
+Pos,Positive
+Poss,Possible
+Possy,Possibly
+Postop,Postoperative
+Postopy,Postoperatively
+Ppl,People
+Prby,Probably
+Predn,Prednisone
+Preg,Pregnant
+Pregy,Pregnancy
+Prev,Previous
+Prevy,Previously
+Prg,Progress
+Prgd,Progressed
+Prgg,Progressing
+Prgn,Progression
+Prgr,Progress
+Prgrd,Progressed
+Prgre,Progressive
+Prgrg,Progressing
+Prgrs,Progresses
+Prgrv,Progressive
+Prgs,Progresses
+Prob,Problem
+Probs,Problems
+Prophy,Prophylaxis
+Prt,Part
+Pry,Probably
+Psych,Psychiatry
+Psycht,Psychiatrist
+Pt,Patient
+Pta,Patient aware already.
+Ptag,Patient agreeable.
+Ptau,Patient alert updated.
+Pulm,Pulmonology
+Pulmt,Pulmonologist
+Pv,Previous
+Pvy,Previously
+Py,Pharmacy
+Pyelo,Pyelonephritis
+Pyt,Pharmacist
+Rads,Radiology
+Radt,Radiologist
+Rcd,Record
+Rcdd,Recorded
+Rcdg,Recording
+Rcds,Records
+Rcn,Recommendation
+Rcou,Reviewed Coumadin labs/See Flowsheet.
+Rease,Reassurance
+Reasg,Reassuring
+Rec,Recommend
+Recd,Recommended
+Recg,Recommending
+Rech,Recheck
+Rechd,Rechecked
+Rechg,Rechecking
+Rechs,Rechecks
+Reck,Recheck
+Reckd,Rechecked
+Reckg,Rechecking
+Recks,Rechecks
+Recn,Recommendation
+Recn,Recommendation
+Recs,Recommendations
+Redu,Reduce
+Redud,Reduced
+Redug,Reducing
+Redun,Reduction
+Redus,Reduces
+Refu,Refuse
+Refud,Refused
+Refug,Refusing
+Reful,Refusal
+Refus,Refuses
+Reg,Regular
+Reg,Regular
+Regy,Regularly
+Regy,Regularly
+Rel,Relate
+Reld,Related
+Reldt,Related to
+Relg,Relating
+Relgt,Relating to
+Reln,Relation
+Relnt,Relation to
+Rels,Relates
+Relst,Relates to
+Relt,Relate to
+Relv,Relative
+Relvs,Relatives
+Relvt,Relative to
+Rely,Relatively
+Remo,Remove
+Remod,Removed
+Remog,Removing
+Remol,Removal
+Remos,Removes
+Reso,Resolve
+Resod,Resolved
+Resog,Resolving
+Reson,Resolution
+Resos,Resolves
+Rf,Refill
+Rfd,Refilled
+Rfg,Refilling
+Rfl,Referral
+Rfld,Referred
+Rfr,Refer
+Rfrd,Referred
+Rfrg,Referring
+Rfrn,Referral
+Rfs,Refills
+Rfs,Refills
+Rheum,Rheumatology
+Rheumt,Rheumatologist
+Rhumid,Recommend ultrasonic humidifier.
+Rlab,Reviewed labs. Will discuss at Appointment.
+Rq,Request
+Rqd,Requested
+Rqg,Requesting
+Rqs,Requests
+Rrlab,We reviewed the patient's recent labwork.
+Rslt,Result
+Rsltd,Resulted
+Rsltg,Resulting
+Rslts,Results
+Rtc,Return to clinic
+Rv,Review
+Rvd,Reviewed
+Rvg,Reviewing
+Rx,Prescription
+Rxd,Prescribed
+Rxg,Prescribing
+Rxs,Prescriptions
+Sched,Schedule
+Schedd,Scheduled
+Schedg,Scheduling
+Scheds,Schedules
+Sd,Said
+Sdc,Self-discontinued
+Sdcn,Self-discontinuation
+Sdoc,See Documents.
+Sensn,Sensation
+Sensv,Sensitive
+Sensvy,Sensitivity
+Sev,Several
+Sfs,See flowsheet.
+Sfx,Side effects
+Shx,Social history
+Signif,Significant
+Signife,Significance
+Sigo,Significant other
+Sim,Similar
+Simv,Simvastatin
+Simva,Simvastatin
+Simy,Similarly
+Slabnl,Slightly abnormal
+Slnl,Slightly abnormal
+Sm,Some
+Smaw,Small airway
+Smwt,Somewhat
+Sochx,Social history
+Spc,See paper chart.
+Spont,Spontaneous
+Sponty,Spontaneously
+Ss,Symptoms
+Ssc,Symptomatic
+Sscy,Symptomatically
+Ssjkp,See above subject. --Jonathan P.
+Surg,Surgery
+Surghx,Surgical history 
+Surgs,Surgeries
+Sx,Signs
+Sys,System
+Sysc,Systemic
+Syscy,Systemically
+Syss,Systems
+Sz,Seizure
+Szs,Seizures
+Tab,Tablet
+Tabs,Tablets
+Tdy,Today
+Tdys,Today's
+Temp,Temporary
+Tempy,Temporarily
+Th,The
+Thm,Them
+Thr,There
+Thru,Through
+Titr,Titrate
+Titrd,Titrated
+Titrg,Titrating
+Titrn,Titration
+Titrs,Titrates
+Tm,Time
+Tmw,Tomorrow
+Tn,Then
+Ts,This
+Tt,That
+Ttp,Tenderness to palpation
+Tx,Treatment
+Txa,Treatment agreement
+Txd,Treated
+Txg,Treating
+Txo,Treatment options
+Txs,Treatments
+Ty,They
+Tyl,Tylenol
+U/s,Ultrasound
+Ucc,Urgent care
+Unavail,Unavailable
+Undxd,Undiagnosed
+Unreld,Unrelated
+Unremark,Unremarkable
+Untxd,Untreated
+Uro,Urology
+Urot,Urologist
+Usu,Usual
+Usuy,Usually
+Utd,UpToDate
+UTIconf,Inform patient that bladder infection was confirmed on culture.  Antibiotic looks like it has good coverage.
+UTInoconf,Inform patient that bladder infection was not confirmed on culture. OK to discontinue antibiotics. Let us know if symptoms don't resolve.
+Utox,Urine toxicology
+Vic,Vicodin
+Vist,Visit
+Vs,Versus
+Vst,Visit
+Vsts,Visits
+Waw,Watchful waiting
+Wawa,Watchful waiting
+Wcc,Well child check
+Wd,Would
+Wgt,Weight
+Wgtl,Weight loss
+Wi,With
+Wl,Will
+Wn,When
+Wo,Without
+Wr,Were
+Wrs,Worse
+Wrsg,Worsening
+Wrsn,Worsen
+Wrt,Write
+Ws,Was
+Wsrd,Worsened
+Wt,What
+Wu,Workup
+Wud,Worked up
+Wug,Working up
+Wus,Workups
+Ww,Worse with
+Wyp,Would you please
+Wypn,Would you please inform patient tests were normal.
+Ydy,Yesterday
+Ydys,Yesterday's
+Yest,Yesterday
+Yests,Yesterday's
+Yr,Your
+Zol,Zoloft
