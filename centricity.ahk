@@ -21,6 +21,11 @@ IfWinNotExist, Update
 	Click, 13, %ypos%
 }
 return
+F1::
+Send ^c
+IfWinExist, Update
+WinActivate, Update
+Return
 
 #IfWinActive
 
