@@ -69,7 +69,7 @@ return
 ; Shift Ctrl-O: Open Attachment
 ^+o::
 ; Doesn't check location precisely yet, Assumes in Desktop:Documents
-; Two Finger Left TipTap
+; Two Finger 'Right TipTap
 
 IfWinActive, Chart
 	{
@@ -77,6 +77,20 @@ IfWinActive, Chart
 	WinGetPos,,,winwidth,,A
 	xpos := winwidth - 70
 	Click, %xpos%, 385
+	}
+return
+
+; Shift Ctrl-u: Open Update
+^+u::
+; Doesn't check location precisely yet, Assumes in Desktop:Documents
+; Two Finger left TipTap
+
+IfWinActive, Chart
+	{
+	; X position of control is defined from right boarder.
+	WinGetPos,,,winwidth,,A
+	xpos := winwidth - 350
+	Click, %xpos%, 129
 	}
 return
 
