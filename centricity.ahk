@@ -9,6 +9,10 @@ return
 `::
 WinActivate, Chart
 return
+F1::
+Send ^v
+WinActivate, Chart
+Return
 
 #IfWinActive, Chart
 `::
