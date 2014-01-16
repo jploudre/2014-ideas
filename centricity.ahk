@@ -69,6 +69,20 @@ return
 
 ; Hyper-Escape: Ruh-oh
 
+; Shift Ctrl-a: Open Append
+^+a::
+; Doesn't check location precisely yet, Assumes in Desktop:Documents
+; Three Finger TipTap Middle
+
+IfWinActive, Chart
+	{
+	; X position of control is defined from right boarder.
+	WinGetPos,,,winwidth,,A
+	xpos := winwidth - 205
+	Click, %xpos%, 129
+	}
+return
+
 
 ; Shift Ctrl-O: Open Attachment
 ^+o::
