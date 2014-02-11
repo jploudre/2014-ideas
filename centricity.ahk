@@ -13,6 +13,15 @@ F1::
 Send ^v
 WinActivate, Chart
 Return
+[::
+Send ^{PgDn}
+return
+]::
+Send ^{PgUp}
+return
+\::
+Send ^e
+return
 
 #IfWinActive, Chart
 `::
