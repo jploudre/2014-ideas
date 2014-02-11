@@ -14,10 +14,10 @@ Send ^v
 WinActivate, Chart
 Return
 [::
-Send ^{PgDn}
+Send ^{PgUp}
 return
 ]::
-Send ^{PgUp}
+Send ^{PgDn}
 return
 \::
 Send ^e
