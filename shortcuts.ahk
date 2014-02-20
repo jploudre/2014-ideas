@@ -19,18 +19,6 @@ LWin::return
 
 #Include i'mdone2(7).ahk
 
-; Chart Autocompleter
-
-`::
-ifWinActive, Patient Chart
-{
-WinGetText wintext
-IfInString, wintext, pcsProgressNote
-{
-run, unfocus-icd(2012).ahk
-}
-}
-return
 
 ;Add chronic pain diagnosis 
 #+c::
