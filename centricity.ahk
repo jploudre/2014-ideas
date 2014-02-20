@@ -175,7 +175,7 @@ ExamFromCSV(ByRef CSVfile, Theline, howtohandle := 0)
 		
 	}
 	Click %ExamTabxpos%, %ExamTabypos%
-	Sleep 1000
+	Sleep 500
 	if (howtohandle = 0) ; Default is Normal
 	{
 	Click %ExamSectionNormalxpos%, %ExamSectionNormalypos%
