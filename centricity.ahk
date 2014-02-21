@@ -23,6 +23,11 @@ return
 Send ^e
 return
 
+#IfWinActive, End Update
+\::
+Send !o
+return
+
 #IfWinActive, Chart
 `::
 IfWinExist, Update
