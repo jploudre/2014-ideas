@@ -5,8 +5,7 @@ Setkeydelay 200
 return
 
 #IfWinActive, Update
-`::
-WinActivate, Chart
+`::PatternHotKey(".->GotoChart","..->SwapTextView")
 return
 F1::
 Send ^v
@@ -45,10 +44,6 @@ WinActivate, Update
 Return
 
 #IfWinActive
-
-^1::
-AddQTfromCSV(QTinput)
-return
 
 F2::
 ExamFromCSV(PECCC, 1)
@@ -201,6 +196,16 @@ ExamFromCSV(ByRef CSVfile, Theline, howtohandle := 0)
 	return	
 	}
 }
+
+GotoChart:
+WinActivate, Chart
+return
+
+SwapTextView:
+Send +{F8}
+return
+
+; Downloaded Functions ----------------------------------------------------------------------------------
 
 Clip(Text="", Reselect="") ; http://www.autohotkey.com/forum/viewtopic.php?p=467710 , modified August 2012
 {
