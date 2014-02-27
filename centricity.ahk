@@ -1,6 +1,5 @@
 CoordMode, Mouse, Window
 FileRead, PECCC, PE-CCC.csv
-FileRead, QTinput, qtinput.csv
 Setkeydelay 200
 
 return
@@ -200,39 +199,6 @@ ExamFromCSV(ByRef CSVfile, Theline, howtohandle := 0)
 	SetKeyDelay, 200
 	Send %howtohandle%
 	return	
-	}
-}
-
-AddQTfromCSV(ByRef CSVfile)
-{
-	; Assume: In the Preferences
-	ifWinActive, Preferences
-	{
-
-	Loop, parse, CSVfile, `n, `r
-	{
-		loop, parse, A_Loopfield, CSV
-		{
-			if (A_Index = "1"){ 
-			abbreviation := A_Loopfield
-			}
-			if (A_Index = "2"){ 
-			expansion := A_Loopfield
-			}	
-		}
-	Click, 335, 176
-	Sendraw %abbreviation%
-	Sleep 100
-	Send {tab}
-	Sleep 100
-	Sendraw %expansion%
-	Sleep 100
-	Click, 673, 234
-	Sleep 1000
-	}
-	}
-	else {
-	return ; not in preferences window
 	}
 }
 
