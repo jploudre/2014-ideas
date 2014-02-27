@@ -271,3 +271,227 @@ Clip(Text="", Reselect="") ; http://www.autohotkey.com/forum/viewtopic.php?p=467
 	Clip:
 	Return Clip()
 }
+
+; http://www.autohotkey.com/board/topic/66855-patternhotkey-map-shortlong-keypress-patterns-to-anything/?hl=%2Bpatternhotkey
+
+; PatternHotKey / KeyPressPattern
+
+; PatternHotKey registers one or multiple patterns of a hotkey to either sending keys, going to a
+;               label or calling a function with zero or one parameter.
+;
+; Usage : hotkey::PatternHotKey("command1", ["command2", "command3", length(integer), period(float)])
+;
+;     where commands match one of the following formats:
+;         "pattern:keys"                  ; Maps pattern to send keys
+;         "pattern->label"                ; Maps pattern to label (GoSub)
+;         "pattern->function()"           ; Maps pattern to function myfunction with
+;                                           no parameter
+;         "pattern->function(value)"      ; Maps pattern to function myfunction with
+;                                           the first parameter equal to 'value'
+;
+;         and patterns match the following formats:
+;             '.' or '0' represents a short press
+;             '1' to '9' and 'A' to 'Z' represents a long press of
+;                                       the specified length (base 36)
+;             '-' or '_' represents a long press of any length
+;             '?' represents any press
+;             '~' as prefix marks the following string as a
+;                 regular expression for the pattern
+;
+;     length : Maximum length of returned pattern. Automatically detected unless
+;              using custom regular expression patterns. Keeping this value to the
+;              minimum will speed up keypress detection.
+;     period : Amount of time in seconds to wait for additional keypresses.
+;
+;     e.g. "01->mylabel" maps a short press followed by a 0.2 to 0.4 seconds press to
+;                        the 'mylabel' label.
+;          "_:{Esc}" maps a long press to sending the Esc key.
+;          ".?-_0->myfunction(1)" maps a short press followed by any press followed by
+;                                 2 long press to calling 'myfunction(1)'.
+;          "~^[6-9A-Z]$->myfunction()" maps the regular expression '^[6-9A-Z]$' (exact
+;                                      length match a long press of length '6' to 'Z')
+;                                      to calling 'myfunction()'.
+PatternHotKey(arguments*)
+{
+    period = 0.2
+    length = 1
+
+    ; Parse input
+    for index, argument in arguments
+    {
+        ; Use any float as period
+        if argument is float
+            period := argument, continue
+
+        ; Use any integer as length. Automatically calculated
+        ; unless using custom patterns ('~' prefix).
+        if argument is integer
+            length := argument, continue
+
+        ; Check for Send command (':')
+        separator := InStr(argument, ":", 1) - 1
+        if ( separator >= 0 )
+        {
+            pattern   := SubStr(argument, 1, separator)
+            command    = Send
+            parameter := SubStr(argument, separator + 2)
+        }
+        else
+        {
+            ; Check for Function or GoSub command ('->')
+            separator := InStr(argument, "->", 1) - 1
+            if ( separator >= 0 )
+            {
+                pattern := SubStr(argument, 1, separator)
+
+                call := Trim(SubStr(argument, separator + 3))
+                parenthesis := InStr(call, "(", 1, separator) - 1
+                if ( parenthesis >= 0 )
+                {
+                    ; Parse function name and single parameter
+                    command   := SubStr(call, 1, parenthesis)
+                    parameter := Trim(SubStr(call, parenthesis + 1), "()"" `t")
+                }
+                else
+                {
+                    command    = GoSub
+                    parameter := call
+                }
+            }
+            else
+                continue
+        }
+
+        ; Convert pattern to regular expression
+        ;
+        ; Note: Treat '~' as an escape character for custom regular expressions.
+        ;       Custom regular expressions can't have the pattern length
+        ;       automatically calculated, so the length parameter might be
+        ;       necessary.
+        if ( Asc(pattern) = Asc("~") )
+            pattern := SubStr(pattern, 2)
+        else
+        {
+            ; Short press
+            StringReplace, pattern, pattern, ., 0, All
+
+            ; Long press
+            StringReplace, pattern, pattern, -, [1-9A-Z], All
+            StringReplace, pattern, pattern, _, [1-9A-Z], All
+
+            ; Any press
+            StringReplace, pattern, pattern, ?, [0-9A-Z], All
+
+            ; Exact length match
+            pattern := "^" . pattern . "$"
+
+            ; Record max pattern length
+            if ( length < separator )
+                length := separator
+        }
+
+        patterns%index%   := pattern
+        commands%index%   := command
+        parameters%index% := parameter
+    }
+
+    ; Record key press pattern
+    keypress := KeyPressPattern(length, period)
+
+    ; Try to find matching pattern
+    Loop %index%
+    {
+        pattern   := patterns%A_Index%
+        command   := commands%A_Index%
+        parameter := parameters%A_Index%
+
+        if ( pattern && RegExMatch(keypress, pattern) )
+        {
+            if ( command = "Send" )
+                Send % parameter
+            else if ( command = "GoSub" and IsLabel(parameter) )
+                gosub, %parameter%
+            else if ( IsFunc(command) )
+                %command%(parameter)
+        }
+    }
+}
+
+; KeyPressPattern returns a base-36 string pattern representing the recorded
+;                 keypresses for the current hotkey. Each digit represents a
+;                 keypress, indicating how much "pressed down time" (in amount
+;                 of period) a key was down, with 0 representing a short press.
+;
+;     length       : Maximum length of returned pattern. Keeping this value to
+;                    the minimum will speed up keypress detection.
+;     period       : Amount of time in seconds to wait for additional keypresses.
+;
+;     e.g. (Using the default period of 0.2 seconds)
+;          "01" is a short press followed by a 0.2 to 0.4 seconds press
+;          "30" is a 0.6 to 0.8 seconds press followed by a short press
+;          "000" is triple-click (3 short press)
+KeyPressPattern(length = 2, period = 0.2)
+{
+    ; Find pressed key
+    key := RegExReplace(A_ThisHotKey, "[\*\~\$\#\+\!\^]")
+    IfInString, key, %A_Space%
+        StringTrimLeft, key, key, % InStr(key, A_Space, 1)
+
+    ; Find modifiers
+    if key in Alt,Ctrl,Shift,Win
+        modifiers := "{L" key "}{R" key "}"
+
+    current = 0
+    loop
+    {
+        ; Wait for key up
+        KeyWait %key%, T%period%
+        ; If key up was received...
+        if ( ! ErrorLevel )
+        {
+            ; Append code in base 36 to pattern and reset current code
+            pattern .= current < 10
+                       ? current
+                       : Chr(55 + ( current > 36 ? 36 : current ))
+            current = 0
+        }
+        else
+            current++
+
+        ; Return pattern if it is of desired length
+        if ( StrLen(pattern) >= length )
+            return pattern
+
+        ; If key up was received...
+        if ( ! ErrorLevel )
+        {
+            ; Wait for next key down of the same key
+            ;
+            ; Capslock, mouse buttons and hotkeys using the no reentry ('$' prefix) cannot use
+            ; Input. KeyWait is used instead, but it cannot detect cancelled patterns (a different
+            ; key is pressed before timeout) or modifier keys.
+            if ( key in Capslock, LButton, MButton, RButton or Asc(A_ThisHotkey) = Asc("$") )
+            {
+                KeyWait, %key%, T%period% D
+
+                ; If key down timed out, return pattern
+                if ( ErrorLevel )
+                    return pattern
+            }
+            else
+            {
+                Input,, T%period% L1 V,{%key%}%modifiers%
+
+                ; If key down timed out, return pattern
+                if ( ErrorLevel = "Timeout" )
+                    return pattern
+                ; If a different key is pressed, cancel pattern
+                else if ( ErrorLevel = "Max" )
+                    return
+                ; If input is cancelled, cancel pattern
+                else if ( ErrorLevel = "NewInput" )
+                    return
+            }
+        }
+    }
+}
