@@ -1,16 +1,13 @@
 CoordMode, Mouse, Window
 FileRead, PECCC, PE-CCC.csv
 Setkeydelay 200
+PreviousExamTab := 0
 
 return
 
 #IfWinActive, Update
 `::PatternHotKey(".->GotoChart","..->SwapTextView")
 return
-F1::
-Send ^v
-WinActivate, Chart
-Return
 [::
 Send ^{PgUp}
 return
@@ -37,34 +34,38 @@ IfWinNotExist, Update
 	Click, 13, %ypos%
 }
 return
-F1::
-Send ^c
-IfWinExist, Update
-WinActivate, Update
-Return
 
 #IfWinActive
 
 F2::
-ExamFromCSV(PECCC, 1)
-ExamFromCSV(PECCC, 2)
-ExamFromCSV(PECCC, 3)
-ExamFromCSV(PECCC, 4)
-ExamFromCSV(PECCC, 5)
-ExamFromCSV(PECCC, 6)
-ExamFromCSV(PECCC, 10)
-ExamFromCSV(PECCC, 11)
-ExamFromCSV(PECCC, 21)
-
-
+ExamClick(1)
+ExamClick(2)
+ExamClick(3)
+ExamClick(4)
+ExamClick(5)
+ExamClick(6)
+ExamClick(10)
+ExamClick(11)
+ExamClick(21)
+ExamDone()
 return
 
 +F2::
-ExamFromCSV(PECCC, 1)
-ExamFromCSV(PECCC, 10)
-ExamFromCSV(PECCC, 11)
-ExamFromCSV(PECCC, 24)
+ExamClick(1)
+ExamClick(10)
+ExamClick(11)
+ExamClick(24)
+ExamDone()
+return
 
+F1::
+ExamClick(1, 1)
+ExamDone()
+return
+
++F1::
+ExamClick(1, "No Specific Exam today, counselling visit.")
+ExamDone()
 return
 
 ; Hyper-Space: I'm Done
@@ -137,9 +138,11 @@ return
 
 ; Functions
 
-ExamFromCSV(ByRef CSVfile, Theline, howtohandle := 0)
+ExamClick(Theline, howtohandle := 0)
 {
-	Loop, parse, CSVfile, `n, `r
+	global
+	; Hardwire the PECCC
+	Loop, parse, PECCC, `n, `r
 	{
 		if (theline != A_Index)
 		continue
@@ -148,6 +151,7 @@ ExamFromCSV(ByRef CSVfile, Theline, howtohandle := 0)
 		loop, parse, A_Loopfield, CSV
 		{
 			if (A_Index = "1"){
+			CurrentExamTab := A_LoopField
 			}
 			if (A_Index = "2"){
 			}
@@ -173,8 +177,13 @@ ExamFromCSV(ByRef CSVfile, Theline, howtohandle := 0)
 		}
 		
 	}
+	If (CurrentExamTab != PreviousExamTab)
+	{
 	Click %ExamTabxpos%, %ExamTabypos%
 	Sleep 500
+	; Now Set the Previous Tab
+	PreviousExamTab := CurrentExamTab
+	}
 	if (howtohandle = 0) ; Default is Normal
 	{
 	Click %ExamSectionNormalxpos%, %ExamSectionNormalypos%
@@ -191,10 +200,15 @@ ExamFromCSV(ByRef CSVfile, Theline, howtohandle := 0)
 	{
 	Click %ExamSectionTextxpos%, %ExamSectionTextypos%
 	Sleep 200
-	SetKeyDelay, 200
-	Send %howtohandle%
+	Clip(howtohandle)
 	return	
 	}
+}
+
+ExamDone()
+{
+	global
+	PreviousExamTab := 0
 }
 
 GotoChart:
