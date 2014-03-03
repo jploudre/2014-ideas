@@ -6,7 +6,7 @@ PreviousExamTab := 0
 return
 
 #IfWinActive, Update
-`::PatternHotKey(".->GotoChart","..->SwapTextView")
+`::PatternHotKey(".->GotoChart","..->SwapTextView","_->SwapTextView")
 return
 [::
 Send ^{PgUp}
@@ -187,19 +187,19 @@ ExamClick(Theline, howtohandle := 0)
 	if (howtohandle = 0) ; Default is Normal
 	{
 	Click %ExamSectionNormalxpos%, %ExamSectionNormalypos%
-	Sleep 200
+	Sleep 300
 	return
 	}
 	if (howtohandle = 1) ; Select the field (use for last item)
 	{
 	Click %ExamSectionTextxpos%, %ExamSectionTextypos%
-	Sleep 200
+	Sleep 300
 	return	
 	}
 	else
 	{
 	Click %ExamSectionTextxpos%, %ExamSectionTextypos%
-	Sleep 200
+	Sleep 300
 	Clip(howtohandle)
 	return	
 	}
