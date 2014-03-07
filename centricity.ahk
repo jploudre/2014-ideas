@@ -6,7 +6,7 @@ PreviousExamTab := 0
 return
 
 #IfWinActive, Update
-`::PatternHotKey(".->GotoChart","..->SwapTextView","_->SwapTextView")
+`::PatternHotKey(".->GotoChart","..->SwapTextView", "_->SwapTextView")
 return
 [::
 Send ^{PgUp}
@@ -19,8 +19,7 @@ Send ^e
 return
 
 #IfWinActive, End Update
-\::
-Send !o
+\::PatternHotKey(".->HoldUpdate","...->SaveUpdate")
 return
 
 #IfWinActive, Chart
@@ -217,6 +216,14 @@ return
 
 SwapTextView:
 Send +{F8}
+return
+
+SaveUpdate:
+Send !s
+return
+
+HoldUpdate:
+Send !o
 return
 
 ; Downloaded Functions ----------------------------------------------------------------------------------
