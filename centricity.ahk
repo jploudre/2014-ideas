@@ -6,7 +6,7 @@ PreviousExamTab := 0
 return
 
 #IfWinActive, Update
-`::PatternHotKey(".->GotoChart","..->SwapTextView", "_->SwapTextView")
+`::PatternHotKey(".->GotoChart","..->SwapTextView")
 return
 [::
 Send ^{PgUp}
@@ -19,7 +19,17 @@ Send ^e
 return
 
 #IfWinActive, End Update
-\::PatternHotKey(".->HoldUpdate","...->SaveUpdate")
+\::PatternHotKey(".->HoldUpdate", "..->SendToBrandie")
+return
+
+!+h::
+Click, 316, 351
+WinWaitNotActive
+SendInput Freema{Enter}
+Sleep, 50
+Click, 240, 345
+WinWaitNotActive
+Click, 301, 506
 return
 
 #IfWinActive, Chart
@@ -224,6 +234,24 @@ return
 
 HoldUpdate:
 Send !o
+return
+
+SendToBrandie:
+; Assumes End Update
+IfWinActive, End Update
+{
+	Click, 316, 351
+	WinWaitNotActive
+	SendInput Freema{Enter}
+	Sleep, 50
+	Click, 240, 345
+	WinWaitNotActive
+	Click, 301, 506
+}
+else
+{
+return	
+}
 return
 
 ; Downloaded Functions ----------------------------------------------------------------------------------
