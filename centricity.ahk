@@ -246,7 +246,7 @@ IfWinActive, End Update
 	Sleep, 50
 	Click, 240, 345
 	WinWaitNotActive
-	Click, 301, 506
+	Send !o
 }
 else
 {
