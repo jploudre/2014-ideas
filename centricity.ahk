@@ -44,6 +44,11 @@ IfWinNotExist, Update
 }
 return
 
+#IfWinActive, Centricity Practice Solution Browser:
+\::
+Send !{F4}
+return
+
 #IfWinActive
 
 F2::
