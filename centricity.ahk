@@ -49,6 +49,27 @@ return
 Send !{F4}
 return
 
+#IfWinActive, Update Problems
+; Long Hold is Top/Bottom. Tap is Up/Down
+Up::PatternHotKey(".->UpdateProblemsUp","_->UpdateProblemsTop")
+Down::PatternHotKey(".->UpdateProblemsDown","_->UpdateProblemsBottom")
+Left::
+Click, 736, 146
+return
+Right::
+Click, 786, 146
+return
+BackSpace::
+Delete::PatternHotKey(".->UpdateProblemsRemove")
+; OK is 'Done'
+\::
+Click, 694, 599
+return
+; Enter should always do OK.
+Enter::
+Click, 694, 599
+return
+
 #IfWinActive
 
 F2::
@@ -258,6 +279,31 @@ else
 return	
 }
 return
+
+; Update Problems Functions
+
+UpdateProblemsTop:
+Click, 762, 100
+return
+
+UpdateProblemsBottom:
+Click, 762, 189
+return
+
+UpdateProblemsUp:
+Click, 762, 122
+return
+
+UpdateProblemsDown:
+Click, 762, 170
+return
+
+UpdateProblemsRemove:
+Click, 508, 572
+WinWaitNotActive
+Send {Enter}
+return
+
 
 ; Downloaded Functions ----------------------------------------------------------------------------------
 
