@@ -1,0 +1,34 @@
+{fn AddRx(){
+	name="HYDROCODONE-ACETAMINOPHEN 5-325 MG TABS"
+	sig="Take 1 tablet by mouth every 4 hours as needed for pain.  May be sedating."
+	start=str(._TODAYSDATE)
+	ID="47463036530"
+	end=ADDDATES(b,"0","0","14")
+	num="30"
+	rf="0"
+Mel_Add_Medication(name, sig, start, ID, end, num, rf)
+return ""}}{AddRx()}
+
+{fn AddRx(){
+	name="HYDROCHLOROTHIAZIDE 25 MG TAB"
+	sig="Take 1 tablet by mouth daily."
+	start=str(._TODAYSDATE)
+	ID="55289013690"
+	end=ADDDATES(b,"0","0","90")
+	num="90"
+	rf="0"
+Mel_Add_Medication(name, sig, start, ID, end, num, rf)
+return ""}}{AddRx()}
+
+
+{fn AddDx(){
+	name="DEMENTIA, SENILE UNSPECIFIED"
+	icd="ICD-290.0"
+	start=str(._TODAYSDATE)
+	end=""
+MEL_ADD_PROBLEM("DX OF", name, icd, start, end)
+return ""}}{AddDx()}
+
+
+
+{PRINTHANDOUT("/Handouts/*FCN/Visit Summaries/Clinical Visit Summary with CPOE Assessments")}
