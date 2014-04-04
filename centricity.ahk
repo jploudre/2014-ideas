@@ -103,6 +103,21 @@ ExamClick(1, "No Specific Exam today, counselling visit.")
 ExamDone()
 return
 
+F10::
+; Send a patient a letter
+Send ^p
+Sleep 100
+Send l
+Sleep 50
+Send {Down 2}
+Sleep 50
+Send {Right 2}
+Sleep 50
+Send l
+sleep 50
+Send {Down 2}{Tab}
+return
+
 ; Hyper-Space: I'm Done
 !#^+Space::
 IfWinActive, Centricity Practice Solution Browser:
