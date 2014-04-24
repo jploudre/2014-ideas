@@ -115,7 +115,11 @@ Send {Right 2}
 Sleep 50
 Send l
 sleep 50
-Send {Down 2}{Tab}
+Send {Down 2}
+Click, 241, 59
+Send B
+Sleep, 100
+Click, 392, 351
 return
 
 ; Hyper-Space: I'm Done
