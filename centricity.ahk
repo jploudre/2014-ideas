@@ -72,6 +72,10 @@ return
 
 #IfWinActive
 
+#Space::
+Run "..\undevelop\unfocus.ahk",
+return
+
 F2::
 ExamClick(1)
 ExamClick(2)
