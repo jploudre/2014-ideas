@@ -17,6 +17,9 @@ return
 \::
 Send ^e
 return
+#Space::
+Run unfocus.exe
+return
 
 #IfWinActive, End Update
 \::PatternHotKey(".->HoldUpdate", "..->SendToBrandie")
@@ -71,10 +74,6 @@ Click, 694, 599
 return
 
 #IfWinActive
-
-#Space::
-Run unfocus.exe
-return
 
 F2::
 ExamClick(1)
