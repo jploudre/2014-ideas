@@ -73,7 +73,7 @@ return
 #IfWinActive
 
 #Space::
-Run "..\undevelop\unfocus.ahk",
+Run unfocus.exe
 return
 
 F2::
