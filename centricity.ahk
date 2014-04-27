@@ -17,6 +17,7 @@ return
 \::
 Send ^e
 return
+Rwin::
 #Space::
 Run unfocus.exe
 return
