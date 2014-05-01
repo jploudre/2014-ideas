@@ -291,10 +291,12 @@ IfWinActive, End Update
 {
 	Click, 316, 351
 	WinWaitNotActive
+	Sleep, 200
 	SendInput Freema{Enter}
-	Sleep, 50
+	Sleep, 200
 	Click, 240, 345
 	WinWaitNotActive
+	Sleep, 200
 	Send !o
 }
 else
