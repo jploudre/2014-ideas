@@ -74,6 +74,11 @@ Enter::
 Click, 694, 599
 return
 
+#IfWinActive, Append to Document
+^s::
+Send !s
+return
+
 #IfWinActive
 
 F2::
