@@ -3,6 +3,25 @@ FileRead, PECCC, PE-CCC.csv
 Setkeydelay 200
 PreviousExamTab := 0
 
+; Scratch Pad Bits
+nobevel = -E0x200
+; Colors from http://ethanschoonover.com/solarized
+base2 = eee8d5
+base3 = fdf6e3
+base02 = 073642
+
+Gui, +AlwaysOnTop -Caption +ToolWindow Border
+GUI, margin, 0,0
+gui, color, %base2%, %base3%
+gui, font, s18 q4 w700 c%base02%, Tahoma
+Gui, Add, Edit, vScratchpadContents x0 y0 W600 h372 %nobevel%
+
+;Gui +LastFound
+;GUI_ID:=WinExist()
+;Gui, Show, xCenter y%fromtopposition% w%windowwidth% h%fullboxheight% Hide, Scratchpad
+;DllCall("AnimateWindow","UInt",GUI_ID,"Int",200,"UInt","0xa0000")
+
+
 return
 
 #IfWinActive, Update
@@ -80,6 +99,37 @@ Send !s
 return
 
 #IfWinActive
+
+
+
+
+CapsLock::PatternHotKey(".->SwapSticky()")
++CapsLock::PatternHotKey(".->SendSticky()")
+
+SwapSticky()
+{
+global fromtopposition
+global windowwidth
+global fullboxheight
+
+IfWinActive, Scratchpad
+{
+Gui, Show, xCenter y10 w600 h372 Hide, Scratchpad
+return
+}
+Gui, Show, xCenter y10 w600 h372, Scratchpad
+}
+return
+
+SendSticky()
+{
+global ScratchpadContents
+GUI, submit
+Clip(ScratchpadContents)
+ScratchpadContents =
+}
+return
+
 
 F2::
 ExamClick(1)
