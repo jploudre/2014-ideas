@@ -475,3 +475,7 @@ return
 ::+lcmp::We also checked your CMP.
 ::3xbp:: Average of 3 automated readings with 60 second pause between readings.
 ::3bp:: 3 blood pressures were measured 1 minute apart and averaged.
+::ujkp::
+SendInput Upcoming Appointment. ............................ Jonathan Ploudre, MD. %A_MMM% %A_DD%, %A_YYYY%
+Send !s
+return
