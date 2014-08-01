@@ -1,0 +1,10 @@
+Orders Chest-xray, flags XR and reminds to associate and sign.
+
+{fn R() {
+MEL_SEND_FLAG("Flag","ncfpxray","N",str(._TODAYSDATE),PATIENT._CASUALNAME,"Xray Ordered","Update","")
+MEL_ADD_ORDER("S", "X-rays/Radiology", "71020-TC - Chest X-ray/Frontal (AP) and Lateral, 2 views - TECHNICAL**","","","","","1","N",USER.LOGINNAME,str(._TODAYSDATE))
+USEROK("* Associate diagnosis" + HRET + "* Sign the order")
+Update_orders()
+return ""}}{R()}Patient sent to xray.
+
+
