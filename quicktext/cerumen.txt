@@ -1,0 +1,9 @@
+{INSERT_TEXT_COMP("Enterprise\FCN\Individual Docs", "Global ear wax")}
+{fn C() 
+{a=getarg(1) b=getarg(2)
+MEL_ADD_PROBLEM('DX OF',a,b,str(._TODAYSDATE),ADDDATES(str(._TODAYSDATE),"0","10","0"))
+MEL_ADD_ORDER("S","Procedures - Misc","69210 - Removal impacted cerumen requiring instrumentation, unilateral**","",b,a,"","","")
+DOCUMENT.TEMP_CCC_CPOE_PL_1=DOCUMENT.TEMP_CCC_PI_MLEF+a+" ("+b+")"
+DOCUMENT.TEMP_CCC_CPOE_MLEF_1="Removal Performed."
+return ""
+}}{C("CERUMEN IMPACTION", "ICD-380.4")}
