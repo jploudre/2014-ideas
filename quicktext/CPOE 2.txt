@@ -1,0 +1,1589 @@
+
+/*
+02-14-11: new file called by updated CPOE forms; loaded by the forms;
+all functions defined in this file have been renamed from their original
+counterparts to prevent any potential for conflicts;
+02-17-11: corrected problem with extra spaces appearing at beginning of problem description;
+04-01-11: corrected problem with & appearing in problem list;
+04-26-11: corrected problem with uncoded problems in problem list (to prevent mel err);
+05-21-11: modified ccc_CPOE_extr_Dx_for_EM_orders_util() to allow for '&' to be in  problem list;
+07-22-11: see below;
+08-30-11: see below; modifications to reduce triggering of ccc_list_assessments_delim() and text translation
+functions which multiple problems added to dropdown lists; updated version
+09-18-11: updated PSIA fx to be called by updated CPOE forms (PSIA is now LOD); updated version
+12-14-11: modified ccc_CPOE_order_charges_vis() to call orders_new;
+12-19-11: see below
+03-02-12: see below
+03-05-12: see below
+09-05-12: ability to exclude order dates for future orders
+*/
+
+/* 02-14-11 */
+// _ccc_fndef_CPOE_2_ver=20110214
+
+/* 08-30-11 */
+// _ccc_fndef_CPOE_2_ver=20110830
+
+/* 09-18-11 */
+_ccc_fndef_CPOE_2_ver=20110918
+
+
+/* 02-14-11; this utility fx returns an array with 2 arrays containing a list of problems found in prob_after
+which are due an assessment based on NumDays */
+fn ccc_CPOE_AssessmentsDue_util(NumDays)
+{
+local ProbAftDelim,ProbAftDelimGF,AssessDueAry,AssessDueDelimAry,tda,days,ct,sz
+local ProbRowGF,DxType,DxDescr,DxCode,AssessGF,AssessDate,DxDescrCodeStr
+
+days=val(str(NumDays))
+if days=0 then return array(array(),array()) endif
+
+/* this contains the users preferred view and eliminates dimmed-out problems */
+ProbAftDelim=prob_after("delimited","","","<Preferred View>","Undimmed")
+if ProbAftDelim="" then return array(array(),array()) endif
+ProbAftDelimGF=getfield(ProbAftDelim,"|","")
+while match(ProbAftDelimGF,"")>0 do remove(ProbAftDelimGF,match(ProbAftDelimGF,""),1) endwhile
+tda=sub(str(document.clinicaldate),1,10)
+AssessDueAry=array()
+AssessDueDelimAry=array()
+
+for ct=1, ct<=size(ProbAftDelimGF), ct=ct+1 do
+ ProbRowGF=getfield(ProbAftDelimGF[ct],"^","")
+ DxType=ProbRowGF[1]
+ DxDescr=ProbRowGF[2]
+ DxCode=ProbRowGF[3]
+ /* 04-26-11 */
+ if DxCode="" then continue endif
+ /* format for AssessGF:
+   Prob Descr^signed vs unsigned^assessment^user^clinical date^assessment comment */
+
+ /* 08-30-11: new utility fx which extracts assessments from globals defined in form OR
+    calls original ccc_list_assessments_delim() function; returns a string with |^ delimiters */
+ AssessGF=getfield(ccc_CPOE_extr_ListAssess_util(DxType,DxDescr,DxCode),"|","")
+
+ if size(AssessGF)>0 then
+  /* AssessGF[1] is the most recent assessment; 5th ^ delimited position is assessment date */
+  AssessDate=str(get(getfield(AssessGF[1],"^",""),5))
+  if durationdays(AssessDate,tda)<days then continue endif
+ endif
+ DxDescrCodeStr=str(DxDescr," (",DxCode,")")
+ sz=size(AssessDueAry)+1
+ AssessDueAry[sz]=DxDescrCodeStr
+ AssessDueDelimAry[sz]=copy(ProbAftDelimGF[ct])
+endfor
+
+return array(AssessDueAry,AssessDueDelimAry)
+}
+
+
+/* new fx; returns 1 if an assessment is due based on 'NumDays' user-defined criteria;
+   used for yellow visibility for the 'Assessment Due' buttons */
+fn ccc_CPOE_AssessmentsDueVis(NumDays)
+{
+local ProbAftDelim,ProbAftDelimGF,tda,days,ct,sz
+local ProbRowGF,DxType,DxDescr,DxCode,AssessGF,AssessDate
+
+days=val(str(NumDays))
+if days=0 then return "" endif
+/* this contains the users preferred view and eliminates dimmed-out problems */
+ProbAftDelim=prob_after("delimited","","","<Preferred View>","Undimmed")
+
+if ProbAftDelim="" then return "" endif
+ProbAftDelimGF=getfield(ProbAftDelim,"|","")
+while match(ProbAftDelimGF,"")>0 do remove(ProbAftDelimGF,match(ProbAftDelimGF,""),1) endwhile
+tda=sub(str(document.clinicaldate),1,10)
+
+for ct=1, ct<=size(ProbAftDelimGF), ct=ct+1 do
+ ProbRowGF=getfield(ProbAftDelimGF[ct],"^","")
+ DxType=ProbRowGF[1]
+ DxDescr=ProbRowGF[2]
+ DxCode=ProbRowGF[3]
+ /* 04-26-11 */
+ if DxCode="" then continue endif
+ /* format for ccc_list_assessments_delim():
+    Prob Descr^signed vs unsigned^assessment^user^clinical date^assessment comment|
+    this fx has been updated to call user-edit criteria for original list_assessments */
+ /* 08-30-11: new utility fx which extracts assessments from globals defined in form OR
+    calls original ccc_list_assessments_delim() function; returns a string with |^ delimiters */
+ AssessGF=getfield(ccc_CPOE_extr_ListAssess_util(DxType,DxDescr,DxCode),"|","")
+ /* return 1 since no assessment has been made */
+ if size(AssessGF)=0 then return 1 endif
+ /* AssessGF[1] is the most recent assessment; 5th ^ delimited position is assessment date */
+ AssessDate=str(get(getfield(AssessGF[1],"^",""),5))
+ /* stop if assessment is NOT due */
+ if durationdays(AssessDate,tda)<days then continue endif
+ /* return 1 since assessment is due */
+ return 1
+endfor
+return ""
+}
+
+
+/* new fx; this utility fx looks to see if duplicate Dx codes are found in the problem list;
+   returns an array containing 3 separate arrays; called by ccc_CPOE_view_insert_assessments() */
+fn ccc_CPOE_DuplicateDxCodesAry_util()
+{
+local DuplicateCodeAry,DuplicateDxAry,DuplicateDxDelimAry,ProbAftDelimGF,ProbAftDelimGF2
+local ProbRow,ProbRowGF,DxCode,DxDescr,DxPrefix,DxDescrCodeStr
+local ct,pos,CodePos,sz
+
+/* 1 dimensional array containing codes which have been duplicated */
+DuplicateCodeAry=array()
+
+/* 2 dimensional array containing Dx descr (code) which correlates with DuplicateCodeAry */
+DuplicateDxAry=array()
+
+/* 2 dimensional array containing delimited row of problem which correlates with DuplicateCodeAry */
+DuplicateDxDelimAry=array()
+
+/* this contains the users preferred view and eliminates dimmed-out problems */
+ProbAftDelimGF=getfield(prob_after("delimited","","","<Preferred View>","Undimmed"),"|","")
+if size(ProbAftDelimGF)=0 then return array(array(),array(),array()) endif
+while match(ProbAftDelimGF,"")>0 do remove(ProbAftDelimGF,match(ProbAftDelimGF,""),1) endwhile
+ProbAftDelimGF2=getfield(prob_after("delimited","","","<Preferred View>","Undimmed"),"|^","")
+
+for ct=1, ct<size(ProbAftDelimGF), ct=ct+1 do
+ ProbRow=ProbAftDelimGF[ct]
+ ProbRowGF=getfield(ProbRow,"^","")
+ DxCode=ProbRowGF[3]
+ /* 04-26-11 */
+ if DxCode="" then continue endif
+ /* first match is expected */
+ pos=match(ProbAftDelimGF2,DxCode)
+ /* check for 2nd match; if not found, then DxCode is not duplicated */
+ if match(ProbAftDelimGF2,pos+1,DxCode)=0 then continue endif
+ /* duplicate found */
+ while pos>0 do
+  DxPrefix=ProbAftDelimGF2[pos-2]
+  DxDescr=ProbAftDelimGF2[pos-1]
+  CodePos=match(DuplicateCodeAry,DxCode)
+  if CodePos=0 then
+   CodePos=size(DuplicateCodeAry)+1
+   DuplicateDxAry[CodePos]=array()
+   DuplicateDxDelimAry[CodePos]=array()
+  endif
+  DuplicateCodeAry[CodePos]=DxCode
+  DxDescrCodeStr=str(DxDescr," (",DxCode,")")
+  if match(DuplicateDxAry[CodePos],DxDescrCodeStr)=0 then
+   sz=size(DuplicateDxAry[CodePos])+1
+   DuplicateDxAry[CodePos][sz]=copy(DxDescrCodeStr)
+   DuplicateDxDelimAry[CodePos][sz]=str(array(DxPrefix,DxDescr,DxCode),"^")
+  endif
+  pos=match(ProbAftDelimGF2,pos+1,DxCode)
+ endwhile
+endfor
+return array(DuplicateCodeAry,DuplicateDxAry,DuplicateDxDelimAry)
+}
+
+
+/* new fx; returns 1 if duplicate diagnosis codes are found in the problem list;
+   used for yellow visibility for the 'Duplicate Dx' buttons */
+fn ccc_CPOE_DuplicateDxCodesVis()
+{
+local ProbAftDelimGF,ProbAftDelimGF2,DxCode,ct,pos
+
+/* this contains the users preferred view and eliminates dimmed-out problems */
+ProbAftDelimGF=getfield(prob_after("delimited","","","<Preferred View>","Undimmed"),"|","")
+if size(ProbAftDelimGF)=0 then return "" endif
+while match(ProbAftDelimGF,"")>0 do remove(ProbAftDelimGF,match(ProbAftDelimGF,""),1) endwhile
+ProbAftDelimGF2=getfield(prob_after("delimited","","","<Preferred View>","Undimmed"),"|^","")
+
+for ct=1, ct<size(ProbAftDelimGF), ct=ct+1 do
+ DxCode=get(getfield(ProbAftDelimGF[ct],"^",""),3)
+ /* 04-26-11 */
+ if DxCode="" then continue endif
+ /* first match is expected */
+ pos=match(ProbAftDelimGF2,DxCode)
+ /* check for 2nd match; if found, then return 1 */
+ if match(ProbAftDelimGF2,pos+1,DxCode)>0 then return 1 endif
+endfor
+return ""
+}
+
+
+/*
+ccc_CPOE_view_insert_assessments(type)
+new fx; views assessments which are due and inserts problems into individual assessment dropdown lists;
+called by 'Assessments Due' and 'Preferred' buttons;
+1) 'type' is 'AssessmentDue' for the 'Assessments Due' action button or 'PreferredAssessment' for the 'Preferred' action button;
+2) 'PrimAssessAry' is an array of problems which will appear at the top of the usercheck box;
+for 'Assessments Due' these represent NEW PROBLEMS; for 'Preferred', these represent problems found in 'PreferredAssessmentObs';
+also, for the the 'Preferred' button, these problems will automatically be checked;
+3) 'SecAssessAry' is an array of all other problems which will populate the usercheck box; these will generally be listed below problems
+found in 'PrimAssessAry'; an exeception to this rule: if duplicate problems are found, then all duplicates will be moved to JUST BENEATH
+the location of the FIRST duplicate which is found;
+4) 'Heading' is the message at the top of the usercheck popup box;
+5) 'AssessForUCAry' is an array of problems which will populate the usercheck box; some values MAY have trailing '+'
+which will cause them to automatically be checked (only for the 'Preferred' button);
+6) this fx also allows the user to check items from the usercheck popup box IN THE ORDER THEY WANT THEM TO APPEAR IN THE DROPDOWN LISTS;
+7) this fx also calls the updated prob_after() function which contains additional arguments which allow for 'Preferred View' and 'Undimmed'
+items only; this restricts the problem list in that DIMMED ITEMS WILL NOT BE CONSIDERED; also, the 'Preferred View' option will
+automatically read the user's preferred view (if applicable) which may have dimmed out problems and/or a different positioning of the problem list
+8) Page refresh is done after usercheck is called to prevent the ghost-like appearance of the screen; open_form_comp is called in specific
+locations to prevent being kicked out (which seems to be the result of calling this immediately after userok)
+*/
+
+fn ccc_CPOE_view_insert_assessments(type,FormTag,PageNum)
+{
+local PrimAssessAry,SecAssessAry,PreferredAssessmentObs,DuplicateCodeAry,DuplicateDxAry,DuplicateDxDelimAry,IndentionSpace,Indent,DuplicateRequiresAssess
+local Heading,IntervalInDays,TitleBar,ObsVal,ProbNewGF,ProbRowGF,DxType,DxDescr,DxCode,MostRecentAssessedSymbol,DuplicateDxCodesVis,DuplicateCodeUtilAry
+local AssessDueAry,AssessDueDelimAry,AssessForUCAry,ProbAftGF,ProbAftDelimGF,Problem,LargeNumMessage,MostRecentAssessed,DuplicatePos,ProbPos
+local ct,ct1,ct2,DL,UC,UCgf,num,temp,pos,AssessDueSymbol,AssessDuePrefix,AssessGF,LastAssessedDate,AutoCheck,LastAssessTxt,DuplicateDxTxt
+local tda,days,AssessSortAry,delim,gf,sz,AssessAry,DuplicatePreProbSymbol,DuplicatePostProbSymbol,DuplicateFoundAry,DuplicateCounter,NumDays
+local AssessmentsDueVis,AssessmentsDueUtilAry,PageAry,FormName,Page
+local AssessForUC
+local AllAssessMatchAry,AllAssessAry,AllAssessAryExtracted,ListAssessExtracted
+
+/* this global is created as a watcher when ccc_CPOE_AssessmentsDueVis() is called in the form 
+and will have a value of 1 if at least one assessment is found;
+only then will ccc_CPOE_AssessmentsDue_util() need to be executed below */
+AssessmentsDueVis=str(_ccc_CPOE_AssessmentsDueVis)
+
+/*
+AssessDueAry:
+1 dimensional array containing problems in list format:
+Problem description (Dx code)
+AssessDueDelimAry:
+1 dimensional array containing problems in delimited format: 
+Prob Descr^signed vs unsigned^assessment^user^clinical date^assessment comment|
+*/
+
+if AssessmentsDueVis="" then
+ AssessDueAry=array()
+ AssessDueDelimAry=array()
+else
+ /* NumDays=user-defined number of days where an assessment becomes due */
+ NumDays=str(_ccc_CPOE_Assess_due_days)
+ AssessmentsDueUtilAry=ccc_CPOE_AssessmentsDue_util(NumDays)
+ AssessDueAry=copy(AssessmentsDueUtilAry[1])
+ AssessDueDelimAry=copy(AssessmentsDueUtilAry[2])
+endif
+
+/* this global is created as a watcher when ccc_CPOE_DuplicateDxCodesVis() is called in the form 
+and will have a value of 1 if at least one duplicate problem is found;
+only then will ccc_CPOE_DuplicateDxCodesAry_util() need to be executed below */
+DuplicateDxCodesVis=str(_ccc_CPOE_DuplicateDxCodesVis)
+
+/*
+DuplicateCodeAry:
+ 1 dimensional array containing only duplicated codes
+DuplicateDxAry:
+ 2 dimensional array of duplicates (Problem (list) format);
+ each array element is an array of ALL DIAGNOSES WHICH CONTAIN THE SAME DX CODE;
+ format: Dx description (Dx code)
+DuplicateDxDelimAry:
+ 2 dimensional array of duplicates (Problem (delimited) format);
+ each array element is an array of ALL DIAGNOSES WHICH CONTAIN THE SAME DX CODE;
+ format: DxType^DxDescr^DxCode
+*/
+
+if DuplicateDxCodesVis="" then
+ DuplicateCodeAry=array()
+ DuplicateDxAry=array()
+ DuplicateDxDelimAry=array()
+else
+ DuplicateCodeUtilAry=ccc_CPOE_DuplicateDxCodesAry_util()
+ DuplicateCodeAry=copy(DuplicateCodeUtilAry[1])
+ DuplicateDxAry=copy(DuplicateCodeUtilAry[2])
+ DuplicateDxDelimAry=copy(DuplicateCodeUtilAry[3])
+endif
+
+/* symbol used preceding a problem which is due an assessment */
+AssessDueSymbol="* * * "
+
+/* this symbol will be used only for the most recently assessed DUPLICATE problem */
+MostRecentAssessedSymbol="     + + + "
+
+/* 03-05-12: changed to using pipes since the tabs are not always interpreted as bolded pipes */
+/* this symbol precedes a DUPLICATE problem; appears as bolded pipes when viewed via usercheck */
+DuplicatePreProbSymbol="||||| "
+/* this symbol follows a DUPLICATE problem; appears as bolded pipes when viewed via usercheck */
+DuplicatePostProbSymbol=" |||||"
+
+/* spacer used for indention; allows items to 'line up' in the usercheck box */
+IndentionSpace="        "
+
+/* user-defined # days for when assessments are due */
+IntervalInDays=str(_ccc_CPOE_Assess_due_days)
+
+/* text for usercheck heading */
+if size(AssessDueAry)=0 or IntervalInDays="" then
+ LastAssessTxt=""
+else
+ LastAssessTxt=str("\r\n* * *     Last assessment was over ",IntervalInDays," days")
+endif
+
+/* text for usercheck heading */
+if size(DuplicateCodeAry)=0 then
+ DuplicateDxTxt=""
+else
+ DuplicateDxTxt=str("\r\n",DuplicatePreProbSymbol,"DUPLICATE DIAGNOSIS",DuplicatePostProbSymbol,"\r\n","+ + +     Most recently assessed of the duplicate diagnoses")
+endif
+
+cond
+case type="AssessmentDue"
+ /* 'Assessments Due' action button */
+ ProbNewGF=getfield(prob_new(),"\n","\r")
+ while match(ProbNewGF,"")>0 do remove(ProbNewGF,match(ProbNewGF,""),1) endwhile
+ /* 02-17-11: remove spaces at beginning of each problem */
+ for ct=1, ct<=size(ProbNewGF), ct=ct+1 do
+  if ProbNewGF[ct][1]<>" " then continue endif
+  while ProbNewGF[ct]<>"" do
+   if ProbNewGF[ct][1]<>" " then break endif
+   ProbNewGF[ct]=remove(ProbNewGF[ct],1,1)
+  endwhile
+ endfor
+ PrimAssessAry=copy(ProbNewGF)
+ Heading="Check the diagnoses to assess in the order you wish to assess them." + LastAssessTxt + DuplicateDxTxt
+ TitleBar="Assessments Due"
+case type="PreferredAssessment"
+ /* 'Preferred' action button; values extracted from obs term (pipe delimited list of preferred problems) */
+ PreferredAssessmentObs=str(_ccc_CPOE_PreferredAssessment_obs)
+ ObsVal=lastobsvalue(PreferredAssessmentObs)
+ PrimAssessAry=if ObsVal="N/A" then array() else getfield(ObsVal,"|","") endif
+ Heading="The PREFERRED list of diagnoses will automatically be checked for this patient.\r\n" +
+  "To RESET, check or uncheck the applicable diagnoses." + LastAssessTxt + DuplicateDxTxt
+ TitleBar="Preferred Diagnoses"
+endcond
+while match(PrimAssessAry,"")>0 do remove(PrimAssessAry,match(PrimAssessAry,""),1) endwhile
+
+/* this contains the users preferred view and eliminates dimmed-out problems */
+ProbAftGF=getfield(prob_after("LIST","","","<Preferred View>","Undimmed"),"\n","\r")
+while match(ProbAftGF,"")>0 do remove(ProbAftGF,match(ProbAftGF,""),1) endwhile
+
+/* 02-17-11: remove spaces at beginning of each problem */
+for ct=1, ct<=size(ProbAftGF), ct=ct+1 do
+ if ProbAftGF[ct][1]<>" " then continue endif
+ while ProbAftGF[ct]<>"" do
+  if ProbAftGF[ct][1]<>" " then break endif
+  ProbAftGF[ct]=remove(ProbAftGF[ct],1,1)
+ endwhile
+endfor
+
+/* will be used to match DxCodes against, so that DxDescr can be extracted */
+ProbAftDelimGF=getfield(prob_after("delimited","","","<Preferred View>","Undimmed"),"|","")
+
+/* contains ALL problems at this level */
+SecAssessAry=copy(ProbAftGF)
+
+/* remove problems from SecAssessAry which are found in PrimAssessAry */
+num=1
+while num<=size(PrimAssessAry) do
+ pos=match(SecAssessAry,PrimAssessAry[num])
+ if pos>0 then remove(SecAssessAry,pos,1) endif
+ num=num+1
+endwhile
+
+/* called by usercheck */
+AssessForUCAry=array()
+
+tda=sub(str(document.clinicaldate),1,10)
+delim=numtoascii(128)
+
+/* this arrays holds all duplicate diagnoses; this will be used to prevent further evaluation of a problem which has already been evaluated;
+this is necessary because duplicate problems may have been moved out of their original positions so they can be grouped together */
+DuplicateCounter=array()
+
+/* first increment AssessForUCAry with problems found in PrimAssessAry (for PreferredAssessment, add a trailing + to automatically check the box),
+then with problems found in SecAssessAry */
+
+for ct=1, ct<=2, ct=ct+1 do
+ cond
+ case ct=1 AssessAry=copy(PrimAssessAry)
+ case ct=2 AssessAry=copy(SecAssessAry)
+ endcond
+
+ for ct1=1, ct1<=size(AssessAry), ct1=ct1+1 do
+  Problem=copy(AssessAry[ct1])
+
+  /* stop here since this problem has already been evaluated */
+  if match(DuplicateCounter,Problem)>0 then continue endif
+
+  ProbPos=match(ProbAftGF,Problem)
+  if ProbPos=0 then continue endif
+
+  /* DxCode extracted from ProbAftDelimGF */
+  DxCode=get(getfield(ProbAftDelimGF[ProbPos],"^",""),3)
+
+  /* 04-26-11 */
+  if DxCode="" then continue endif
+
+  /* check to see if DxCode is a duplicated code */
+  DuplicatePos=match(DuplicateCodeAry,DxCode)
+
+  /* DUPLICATE CODE NOT FOUND */
+  if DuplicatePos=0 then
+   AssessDuePrefix=if size(AssessDueAry)=0 then "" else if match(AssessDueAry,Problem)>0 then AssessDueSymbol else IndentionSpace endif endif
+   sz=size(AssessForUCAry)+1
+   cond
+   case type="AssessmentDue"
+    AssessForUCAry[sz]=str(AssessDuePrefix,Problem)
+   case type="PreferredAssessment"
+    AssessForUCAry[sz]=str(AssessDuePrefix,Problem,if ct=1 then "+" else "" endif)
+   endcond
+   continue
+  endif
+
+  /* DUPLICATE CODE FOUND */
+
+  /* this array will hold all duplicate problems found in DuplicateDxAry;
+     once all duplicates have been extracted, the most recently assessed problem (if applicable)
+     will then be moved to the TOP of this array */
+  DuplicateFoundAry=array()
+
+  /* if ANY duplicate problem is also found to require an assessment, this will be given the value of 'y';
+     this will be used for indentation within usercheck */
+  DuplicateRequiresAssess=""
+
+  /* now loop through all the duplicate diagnoses in the group;
+     this will increment DuplicateFoundAry and DuplicateCounter; also, look to see if any have been previously assessed and, if so,
+     add them to AssessSortAry; they can then be sorted by dates, and the most recent one can be extracted
+     (to be placed at the top of the group and to receive the +++ symbol) */
+  AssessSortAry=array()
+
+  for ct2=1, ct2<=size(DuplicateDxAry[DuplicatePos]), ct2=ct2+1 do
+   ProbRowGF=getfield(copy(DuplicateDxDelimAry[DuplicatePos][ct2]),"^","")
+   DxType=ProbRowGF[1]
+   DxDescr=ProbRowGF[2]
+   DxCode=ProbRowGF[3]
+
+   /* reset 'Problem' to new dx descr and code extracted from array containing duplicates */
+   Problem=str(DxDescr," (",DxCode,")")
+
+   /* DuplicateRequiresAssess will be used for spacing within usercheck */
+   if DuplicateRequiresAssess="" then
+    if size(AssessDueAry)>0 then
+     if match(AssessDueAry,Problem)>0 then DuplicateRequiresAssess="y" endif
+    endif
+   endif
+
+   /* this array is specific to the group of duplicated problems */
+   DuplicateFoundAry[size(DuplicateFoundAry)+1]=Problem
+
+   /* this array contains ALL problems which are found in any of the duplicate arrays */
+   DuplicateCounter[size(DuplicateCounter)+1]=Problem
+
+   /* ccc_CPOE_extr_ListAssess_util() returns a | and ^ delimited string of assessments;
+      this fx ensures that the first element is also the most recent element */
+
+   /* 08-30-11: new utility fx which extracts assessments from globals defined in form OR
+      calls original ccc_list_assessments_delim() function; returns a string with |^ delimiters */
+   AssessGF=getfield(ccc_CPOE_extr_ListAssess_util(DxType,DxDescr,DxCode),"|","")
+
+   /* if no prior assessments, then stop here */
+   if size(AssessGF)=0 then continue endif
+
+   /* this represents the date of the most recently assessed problem */
+   LastAssessedDate=str(get(getfield(AssessGF[1],"^",""),5))
+
+   days=durationdays(LastAssessedDate,tda)
+   cond
+   case days<10 days=str("0000",days)
+   case days<100 days=str("000",days)
+   case days<1000 days=str("00",days)
+   case days<10000 days=str("0",days)
+   else days=str(days)
+   endcond
+   AssessSortAry[size(AssessSortAry)+1]=str(days,delim,Problem)
+  endfor
+  if size(AssessSortAry)>0 then
+   /* since at least one problem has had a previous assessment, then
+      sort by date and move the problem with the most recent assessment to the TOP */
+   sort(AssessSortAry)
+   /* extract first element of AssessSortAry since it will contain the problem with the most recent assessment;
+      gf[1] is the day-string used for sorting; gf[2] is the problem */
+   gf=getfield(copy(AssessSortAry[1]),delim,"")
+   Problem=gf[2]
+   pos=match(DuplicateFoundAry,Problem)
+   if pos>0 then
+    /* restructure DuplicateFoundAry by moving the problem most recently assessed to top of array */
+    remove(DuplicateFoundAry,pos,1)
+    insert(DuplicateFoundAry,1,Problem)
+   endif
+  endif
+
+  for ct2=1, ct2<=size(DuplicateFoundAry), ct2=ct2+1 do
+   /* reset 'Problem' to the problem found in DuplicateFoundAry */
+   Problem=DuplicateFoundAry[ct2]
+
+   /* ct2=1 represents the first array element of DuplicateFoundAry which MAY also be the most recently assessed problem
+      (depending on whether AssessSortAry has any values); if AssessSortAry has values, then this entry IS ALSO
+      the most recently assessed */
+   MostRecentAssessed=if ct2=1 and size(AssessSortAry)>0 then MostRecentAssessedSymbol else "" endif
+
+   /* assign assess due symbol (if applicable) */
+   AssessDuePrefix=if size(AssessDueAry)=0 then "" else if match(AssessDueAry,Problem)>0 then AssessDueSymbol else "" endif endif
+
+   /* AutoCheck will receive a '+' value only for 'Preferred' options AND if ct=1 (values are from PrimAssessAry) */
+   AutoCheck=if type="PreferredAssessment" and ct=1 and match(PrimAssessAry,Problem)>0 then "+" else "" endif
+
+   /* this determines the amount of indention which will be placed at the beginning of each problem;
+      this keeps problems lined up which is more esthetically pleasing */
+   Indent=
+    cond
+    case ct2=1 ""
+    case AssessDuePrefix<>"" or DuplicateRequiresAssess="" IndentionSpace
+    else str(IndentionSpace,IndentionSpace)
+    endcond
+   /* increment the array which will be called by usercheck */
+   AssessForUCAry[size(AssessForUCAry)+1]=str(Indent,AssessDuePrefix,DuplicatePreProbSymbol,Problem,DuplicatePostProbSymbol,MostRecentAssessed,AutoCheck)
+  endfor
+ endfor
+endfor
+
+/* this will ensure that the comment 'more choices on next screen' is on a separate line */
+if size(AssessForUCAry)>15 then Heading=str(Heading,"\r\n") endif
+
+/* 04-01-11: this will allow & to appear in usercheck box and prevent it from appearing as an underscore */
+AssessForUC=str(AssessForUCAry,"^")
+AssessForUC=str(getfield(AssessForUC,"&",""),"&&")
+
+/* '/s' switch will return values in the order in which they were checked */
+UC=usercheck(Heading,AssessForUC,TitleBar,delim,"/s")
+
+/* 04-01-11: all subsequent double && (after the initial one) will still be returned as && instead of &;
+need to convert all double && to single & AFTER usercheck is called and prior to assigning to dropdown lists */
+pos=match(UC,"&")
+if pos>0 then
+ pos=match(UC,pos+1,"&&")
+ while pos>0 do
+  UC=remove(UC,pos,1)
+  pos=match(UC,pos+1,"&&")
+ endwhile
+endif
+
+/* Clear UC from all formatting characters */
+
+while match(UC,AssessDueSymbol)>0 do
+ UC=remove(UC,match(UC,AssessDueSymbol),size(AssessDueSymbol))
+endwhile
+
+while match(UC,MostRecentAssessedSymbol)>0 do
+ UC=remove(UC,match(UC,MostRecentAssessedSymbol),size(MostRecentAssessedSymbol))
+endwhile
+
+while match(UC,DuplicatePreProbSymbol)>0 do
+ UC=remove(UC,match(UC,DuplicatePreProbSymbol),size(DuplicatePreProbSymbol))
+endwhile
+
+while match(UC,DuplicatePostProbSymbol)>0 do
+ UC=remove(UC,match(UC,DuplicatePostProbSymbol),size(DuplicatePostProbSymbol))
+endwhile
+
+while match(UC,IndentionSpace)>0 do
+ UC=remove(UC,match(UC,IndentionSpace),size(IndentionSpace))
+endwhile
+
+UCgf=getfield(UC,delim,"")
+
+if type="PreferredAssessment" then
+ if size(UCgf)=0 and size(PrimAssessAry)>0 then
+  userok("FYI:  You have cleared all 'preferred' problems by unchecking all check boxes.  These can be reset by clicking the 'Preferred' button again and rechecking the applicable problems.")
+ endif
+endif
+
+/* extract values for open_form_comp since page will need to be refreshed due to ghosting-out
+which can appear after the usercheck is closed; the frequent calls to open_form_comp below is
+done to prevent the possibility of being kicked out if open_form_comp is called immediately before userok */
+cond
+case FormTag="CPOE"
+ PageAry=array("A&P 1-2","A&P 3-4","A&P 5-6","A&P 7-8","A&P 9-10","A&P 11-12")
+ FormName="CPOE A&P-CCC"
+case FormTag="CPO2"
+ PageAry=array("A&P 13-14","A&P 15-16","A&P 17-18","A&P 19-20","A&P 21-22","A&P 23-24")
+ FormName="CPOE A&P-Addendum-CCC"
+endcond
+Page=PageAry[PageNum]
+
+/* stop if nothing selected from usercheck */
+cond
+case type="AssessmentDue"
+  if size(UCgf)=0 then
+    /* refresh page */
+    open_form_comp(str("Enterprise\\CCC\\",FormName),Page)
+    return ""
+  endif
+case type="PreferredAssessment"
+  if size(UCgf)=0 then UCgf[1]="N/A" endif
+  obsnow(PreferredAssessmentObs,str(UCgf,"|"))
+  if UCgf[1]="N/A" then
+    /* refresh page */
+    open_form_comp(str("Enterprise\\CCC\\",FormName),Page)
+    return ""
+  endif
+endcond
+
+LargeNumMessage="Due to the number of assessments, "
+if size(UCgf)>24 then
+  /* can allow maximum of 24 assessments to be inserted */
+  UCgf=sub(UCgf,1,24)
+  LargeNumMessage=str(LargeNumMessage,"only the first 24 can be allowed.  Also, ")
+endif
+
+/* remove problems from UCgf if they already exist in any assessment dropdown list */
+for ct=1, ct<=2, ct=ct+1 do
+ if ct=1 then
+  temp=str("DOCUMENT.TEMP_CCC_CPOE_PL_")
+ else
+  if ok(DOCUMENT.TEMP_CCC_CPO2_PL_1)=FALSE then break endif
+  temp=str("DOCUMENT.TEMP_CCC_CPO2_PL_")
+ endif
+ for ct1=1, ct1<=12, ct1=ct1+1 do
+  DL=eval(str(temp,ct1))
+  if DL="" then continue endif
+  if match(UCgf,DL)=0 then continue endif
+  remove(UCgf,match(UCgf,DL),1)
+ endfor
+endfor
+
+/* all problems which have been checked in usercheck are already found in dropdown lists;
+stop here since nothing else needs to be done */
+if size(UCgf)=0 then
+ /* refresh page */
+ open_form_comp(str("Enterprise\\CCC\\",FormName),Page)
+ return ""
+endif
+
+/* 08-30-11: new suppressing global */
+_ccc_CPOE_assess_DL_suppress=1
+
+/* assign problems to next available assessment dropdown list in CPOE form */
+for ct=1, ct<=12, ct=ct+1 do
+ DL=eval(str("DOCUMENT.TEMP_CCC_CPOE_PL_",ct))
+ /* stop since this dropdown list already contains a selection */
+ if DL<>"" then continue endif
+ /* assign UCgf item to next available dropdown list */
+ ccc_eval(str("DOCUMENT.TEMP_CCC_CPOE_PL_",ct),UCgf[1])
+ remove(UCgf,1,1)
+ /* if all assessments have been assigned to a dropdown list then return "" */
+ if size(UCgf)=0 then break endif
+endfor
+
+/* 08-30-11 */
+_ccc_CPOE_assess_DL_suppress=""
+
+if size(UCgf)=0 then
+ /* refresh page */
+ open_form_comp(str("Enterprise\\CCC\\",FormName),Page)
+ return ""
+endif
+
+/* since UCgf still contains assessments which need to populate a dropdown list after looping through all 12 dropdown lists of CPOE,
+then look to CPOE-2 */
+
+/* this doc.temp will be used by CPOE A&P-Addendum-CCC to populate its dropdown lists;
+this will be done when 'ccc_CPOE_assign_overflow_assessments()' is called within the form */
+DOCUMENT.TEMP_CCC_CPOE_ASSESSMENT_OVERFLOW=str(UCgf,"|")
+
+pos=match(get_form_list(),"CPOE A&P-Addendum-CCC")
+cond
+case pos=0
+ /* CPOE A&P-Addendum-CCC is NOT in the update */
+ LargeNumMessage=str(LargeNumMessage,"the 'CPOE A&P-Addendum-CCC' form will be loaded into the update and receive the remaining assessments.")
+case pos>0
+ /* CPOE A&P-Addendum-CCC IS in the update */
+ LargeNumMessage=str(LargeNumMessage,"the 'CPOE A&P-Addendum-CCC' form will receive some assessments.")
+endcond
+userok(LargeNumMessage)
+
+if pos=0 then
+ ccc_SiteSpec_addform("Enterprise\CCC^CPOE A&P-Addendum-CCC","CPOE A&P-CCC","AFTER_CURRENT","","")
+endif
+
+/* refresh page */
+open_form_comp(str("Enterprise\\CCC\\",FormName),Page)
+
+return ""
+}
+
+
+/* new fx; only called from CPOE A&P-Addendum-CCC; this fx assigns all 'overflow' diagnoses to the
+   CPOE A&P-Addendum-CCC form (if applicable) as a result of having called ccc_CPOE_view_insert_assessments() */
+fn ccc_CPOE_assign_overflow_assessments()
+{
+local AssessmentGF,ct,DL
+AssessmentGF=getfield(str(DOCUMENT.TEMP_CCC_CPOE_ASSESSMENT_OVERFLOW),"|","")
+
+for ct=1, ct<=12, ct=ct+1 do
+ DL=eval(str("DOCUMENT.TEMP_CCC_CPO2_PL_",ct))
+ /* stop since this dropdown list already contains a selection */
+ if DL<>"" then continue endif
+ /* assign AssessmentGF item to next available dropdown list */
+ ccc_eval(str("DOCUMENT.TEMP_CCC_CPO2_PL_",ct),AssessmentGF[1])
+ remove(AssessmentGF,1,1)
+ /* if all assessments have been assigned to a dropdown list then return "" */
+ if size(AssessmentGF)=0 then return "" endif
+endfor
+
+/* some problems could not be assigned to a dropdown list due to insufficient space */
+userok("NOTE:  Due to some fields already containing an existing assessment, the final " + str(size(AssessmentGF)) + " (of the 24 maximum assessments) could not be assigned.")
+return ""
+}
+
+
+/* called by the '?' button adjacent to the 'Preferred' button */
+fn ccc_CPOE_info_popup()
+{
+local obs
+obs=str(_ccc_CPOE_PreferredAssessment_obs)
+userok("'ASSESSMENT DUE' AND 'ASSESS PROBLEMS' BUTTONS:\r\n\r\n" + 
+"When at least one assessment is due, the yellow 'Assessment Due' button will appear; otherwise, the 'Assess Problems' button will be visible.  All problems found in the problem list (which are NOT dimmed out) will appear.\r\n\r\n" +
+"Assessments which are due will be preceded by:  * * *\r\n\r\n" +
+"Problems with duplicate diagnosis codes will be grouped together and listed within brackets:  |||||  DUPLICATE DIAGNOSIS  |||||\r\n" +
+"If applicable, the most recently assessed of these duplicates will be listed at the top of the group and followed by:  + + +" + "\r\n\r\n" +
+"Once the dialogue box is closed, the checked problems will automatically appear in the next available dropdown list in the same order they were checked.  If necessary, the CPOE A&P-Addendum-CCC form will be loaded and populated with the applicable problems.\r\n\r\n\r\n" +
+"'PREFERRED' BUTTON:\r\n\r\n" +
+"The 'Preferred' button is similar EXCEPT the 'preferred' problems will be listed at the top and will already be checked.  To ADD or REMOVE preferred problems, check or uncheck the applicable boxes.  Each time the box is closed, the CHECKED items will be saved in the flowsheet as the new 'preferred list'." +
+if obs="" then "\r\n\r\n" + "NOTE:  This button is currently greyed-out since an obs term has not been defined in the user-edit file." else "" endif)
+}
+
+
+/* called by all navigation buttons at the bottom of the page;
+   calls ccc_CPOE_ClosePage() prior to loading and going to the applicable form */
+fn ccc_CPOE_Navigate(FormToLoad,PageNum,FormTag)
+{
+local MatchAry1,MatchAry2,MatchAry3,CurFormName
+cond
+case PageNum=1 ccc_CPOE_ClosePage(1,2,FormTag)
+case PageNum=2 ccc_CPOE_ClosePage(3,4,FormTag)
+case PageNum=3 ccc_CPOE_ClosePage(5,6,FormTag)
+case PageNum=4 ccc_CPOE_ClosePage(7,8,FormTag)
+case PageNum=5 ccc_CPOE_ClosePage(9,10,FormTag)
+case PageNum=6 ccc_CPOE_ClosePage(11,12,FormTag)
+endcond
+
+MatchAry1=getfield("Entry,Review,PMA,TM,Defer",",","")
+MatchAry2=getfield("HPI,ACV,PMH,FH-SH,RF,ROS,VS,PE,Problems,CPOE,IP",",","")
+MatchAry3=getfield("Anticoag,Asthma_HPI,Asthma_AMP,Back_Pain,CHF,Depression,Diabetes,Dyspepsia,Headache,Hypertension,Lipid,Prevention_female,Prevention_male,CV_Risk",",","")
+
+cond
+case FormTag="CPOE" CurFormName="CPOE A&P-CCC"
+case FormTag="CPO2" CurFormName="CPOE A&P-Addendum-CCC"
+endcond
+
+cond
+case match(MatchAry1,FormToLoad)>0
+ /* load command for newer buttons */
+ ccc_SiteSpec_load_form_call(FormToLoad,CurFormName)
+case match(MatchAry2,FormToLoad)>0
+ /* load command for original buttons */
+ ccc_load_goto_form(FormToLoad,CurFormName)
+case match(MatchAry3,FormToLoad)>0
+ /* load command for Dx Management buttons */
+ ccc_CPOE_load_DxMgmt_form(FormToLoad,CurFormName)
+
+/* Med Onc forms */
+case FormToLoad="ChemoOrders"
+ ccc_load_goto_Med_Onc_Chemo_Rx_Orders_form()
+case FormToLoad="ChemoViewPrint"
+ ccc_load_goto_Med_Onc_Prior_Chemo_Orders_form()
+case FormToLoad="ChemoAdmin"
+ ccc_load_goto_Med_Onc_Chemo_Admin_form()
+case FormToLoad="ChemoViewPrior"
+ ccc_load_goto_Med_Onc_Prior_Chemo_Admin_form()
+case FormToLoad="PastOncHx"
+ ccc_load_goto_Med_Onc_Past_Treatment_form()
+case FormToLoad="CTCAE"
+ ccc_load_goto_Med_Onc_CTCAE_form()
+case FormToLoad="RECIST"
+ ccc_load_goto_Med_Onc_RECIST_Criteria_form()
+case FormToLoad="SupportiveTx"
+ ccc_load_goto_Med_Onc_Supportive_Tx_form()
+
+/* OB forms */
+case FormToLoad="Intake"
+ ccc_load_goto_OB_Initial_Intake_form()
+case FormToLoad="PrenatalVisit"
+ ccc_load_goto_OB_Prenatal_Visit_form()
+case FormToLoad="PastPregHx"
+ ccc_load_goto_OB_Past_Preg_Hx_form()
+case FormToLoad="Genetic"
+ ccc_load_goto_OB_Genetic_Environ_form()
+case FormToLoad="Flowsheet"
+ ccc_load_goto_OB_Flowsheet_form()
+case FormToLoad="PrenatalLab"
+ ccc_load_goto_OB_Prenatal_Lab_form()
+case FormToLoad="PrenatalEd"
+ ccc_load_goto_OB_Prenatal_Ed_form()
+case FormToLoad="US"
+ ccc_load_goto_OB_US_Data_Entry_form()
+case FormToLoad="PAP"
+ ccc_load_goto_OB_PAP_Smear_Entry_form()
+endcond
+}
+
+
+/* called by ccc_CPOE_Navigate() to load the disease management forms */
+fn ccc_CPOE_load_DxMgmt_form(tag,CurrentForm)
+{
+/* "Tag" is label which represents encounter form; used to load CCCQE forms */
+local path,gf,FormPath,FormName,position
+path=eval(str("ccc_",tag,"_form_path()"))
+gf=getfield(path,"^","")
+if size(gf)<2 then return "" endif
+FormPath=gf[1]
+FormName=gf[2]
+if size(gf)<3 then
+ position="AT_END"
+else
+ position=gf[3]
+endif
+/* defined in 'CCC-fndef-supplement-2.ccc' */
+ccc_add_form_comp(str(FormPath,"^",FormName),CurrentForm,position,"OPEN")
+}
+
+
+/* called as a watcher; extracts the global from HPI content to determine the
+   visibility for the Disease Management navigation buttons */
+fn ccc_CPOE_extr_DxMgmt_vis_from_HPI_content(SpecLabel)
+{
+/* used to extract '_ccc_CPOE_HPI_dz_mgmt_button_vis' from HPI content */
+local pos,pos1,FNAry1,TL_SpecLabel
+
+TL_SpecLabel=tolower(SpecLabel)
+pos=match(_ccc_all_orig_content_TL_label_array,TL_SpecLabel)
+
+if pos=0 then
+ /* new content */
+ pos1=match(_ccc_HPI_SpecLoad_ary,TL_SpecLabel)
+ if pos1>0 then
+  FNAry1=copy(_ccc_HPI_UE_fn_ary_1)
+  _ccc_CPOE_HPI_dz_mgmt_button_vis=FNAry1[7]
+ else
+  _ccc_CPOE_HPI_dz_mgmt_button_vis=""
+ endif
+else
+ /* original content */
+ _ccc_CPOE_HPI_dz_mgmt_button_vis=
+ eval(str("_ccc_",SpecLabel,"_HPI_dz_mgmt_button_vis"))
+endif
+}
+
+
+/* this fx is called prior to inserting various text translations by other forms;
+if a given form has been removed from the update, then the text will also be removed */
+fn ccc_CPOE_GetFormList(GetFormList,FormName)
+{
+match(getfield(GetFormList,"|^",""),FormName)
+}
+
+
+/* text translation fx for all problem dropdown lists, assessment radio buttons, and multi-line edit fields for BOTH forms;
+   this fx is called only within CPOE A&P-CCC */
+fn ccc_CPOE_text(FormTag,DL1,AssessRB1,MLEF1,DL2,AssessRB2,MLEF2,DL3,AssessRB3,MLEF3,DL4,AssessRB4,MLEF4,DL5,AssessRB5,MLEF5,DL6,AssessRB6,MLEF6,DL7,AssessRB7,MLEF7,DL8,AssessRB8,MLEF8,DL9,AssessRB9,MLEF9,DL10,AssessRB10,MLEF10,DL11,AssessRB11,MLEF11,DL12,AssessRB12,MLEF12)
+{
+local heading,ct,num,TxtAry,MLEFLabel,Begin,End,DL,RB,MLEF
+
+if str(DL1,AssessRB1,MLEF1,DL2,AssessRB2,MLEF2,DL3,AssessRB3,MLEF3,DL4,AssessRB4,MLEF4,DL5,AssessRB5,MLEF5,DL6,AssessRB6,MLEF6,DL7,AssessRB7,MLEF7,DL8,AssessRB8,MLEF8,DL9,AssessRB9,MLEF9,DL10,AssessRB10,MLEF10,DL11,AssessRB11,MLEF11,DL12,AssessRB12,MLEF12)="" then return "" endif
+
+/* will use heading only for CPOE form since all text will be in this form */
+cond
+case FormTag="CPOE"
+ heading=str(_ccc_CPOE_cust_text_heading)
+ Begin=1 End=12
+case FormTag="CPO2"
+ heading=""
+ Begin=13 End=24
+endcond
+
+MLEFLabel=str(_ccc_CPOE_cust_text_label)
+
+TxtAry=array()
+
+/* start with num=2 since first arg is FormTag */
+num=2
+for ct=Begin, ct<=End, ct=ct+1 do
+ DL=getarg(num)
+ RB=getarg(num+1)
+ MLEF=getarg(num+2)
+ if str(DL,RB,MLEF)="" then num=num+3 continue endif
+ TxtAry[size(TxtAry)+1]=
+ if DL="" then "" else str("\r\n",fmt(str("Problem # ",ct,":  "),"B"),DL,"\r\n") endif +
+ if RB="" then "" else str(fmt("Assessed as:  ","B"),RB,"\r\n") endif +
+ if MLEF="" then "" else ccc_CPOE_text_MLEF_util(MLEF,MLEFLabel) endif
+ num=num+3
+endfor
+return str(if heading="" then "" else str("\r\n",fmt(heading,"B,2"),"\r\n") endif,str(TxtAry,""))
+}
+
+
+/* utility fx called by ccc_CPOE_text() */
+fn ccc_CPOE_text_MLEF_util(MLEF,Label)
+{
+local NewVal,bs,pos
+if MLEF="" then return "" endif
+bs=numtoascii(92)
+NewVal=MLEF
+
+/* correct problem with backslashes in MLEF fields */
+pos=match(NewVal,bs)
+while pos>0 do
+ NewVal=insert(NewVal,pos+1,str(bs))
+ if pos+2>size(NewVal) then break endif
+ pos=match(NewVal,pos+2,bs)
+endwhile
+
+/* ensure no more than one empty line at top or bottom of text */
+while match(NewVal,"\r\n\r\n")=1 do NewVal=remove(NewVal,1,2) endwhile
+NewVal=getfield(NewVal,"\n","\r")
+while size(NewVal)>0 do
+ if NewVal[size(NewVal)]="" then remove(NewVal,size(NewVal),1) else break endif
+endwhile
+if size(NewVal)=0 then return "" endif
+if Label="" then "" else fmt(Label,"B") endif + str(NewVal,"\r\n","","\r\n")
+}
+
+
+/* returns text translation for all orders which are not associated with a Dx in the dropdown lists;
+   OrdNew is orders_new("delimited"); 'MLEFStr' is str of all MLEF values;
+   09-05-12: user-edit option to exclude future order DATES */
+fn ccc_CPOE_orders_with_no_DX_text(OrdNew,MLEFStr)
+{
+local OrdNewAry,ExcludeOrd,UpdatedOrdAry,ct,ct1,gf,num,sz,tda,TxtStr,OrdTodayAry,OrdFutureAry,OrdDescr,OrdCode,OrdDate,ExcludeOrdCode,OrdFormat,spacer
+local ExcludeOrdDate
+if OrdNew="" then return "" endif
+OrdNewAry=getfield(OrdNew,"|","")
+ExcludeOrdCode=tolower(_ccc_CPOE_Excl_Ord_code)
+ExcludeOrdCode=if match(ExcludeOrdCode,"y")>0 then TRUE else FALSE endif
+ExcludeOrdDate=tolower(_ccc_CPOE_Excl_Ord_date)
+ExcludeOrdDate=if match(ExcludeOrdDate,"y")>0 then TRUE else FALSE endif
+
+OrdFormat=_ccc_CPOE_Ord_format
+if match(OrdFormat,"c")>0 then
+ spacer="  "
+ OrdFormat=", "
+else
+ spacer="\r\n"
+ OrdFormat="\r\n"
+endif
+
+/* exclude orders from text defined in user edit file */
+ExcludeOrd=_ccc_CPOE_Excl_Ord_txt
+if ExcludeOrd="" then "" else
+ ExcludeOrd=getfield(tolower(ExcludeOrd),"~","\r\n")
+ UpdatedOrdAry=array()
+ for ct=1, ct<=size(OrdNewAry), ct=ct+1 do
+  if OrdNewAry[ct]="" then continue endif
+  gf=getfield(tolower(OrdNewAry[ct]),"^","")
+  num=""
+  for ct1=1, ct1<=size(ExcludeOrd), ct1=ct1+1 do
+   if match(gf[1],ExcludeOrd[ct1])>0 then num=1 break endif
+  endfor
+  if num<>1 then UpdatedOrdAry[size(UpdatedOrdAry)+1]=OrdNewAry[ct] endif
+ endfor
+ /* UpdatedOrdAry[] is new array of orders excluding orders defined in ExcludeOrd; reset OrdNewAry[] to UpdatedOrdAry[] */
+ OrdNewAry=UpdatedOrdAry
+endif
+
+sz=size(OrdNewAry)
+if sz=0 then return "" endif
+tda=sub(str(document.clinicaldate),1,10)
+OrdTodayAry=array()
+OrdFutureAry=array()
+/* extract orders not already assigned to specific MLEF */
+for ct=1, ct<=sz, ct=ct+1 do
+ gf=getfield(OrdNewAry[ct],"^","")
+ OrdDescr=gf[1]
+ OrdCode=gf[3]
+ OrdDate=str(gf[4])
+ if ExcludeOrdCode then OrdCode="" endif
+ if durationdays(OrdDate,tda)>=0 then
+  TxtStr=OrdDescr +
+  if OrdCode="" then "" else " (" + OrdCode + ")" endif
+  if match(MLEFStr,TxtStr)=0 then OrdTodayAry[size(OrdTodayAry)+1]=TxtStr endif
+ else
+  TxtStr=OrdDescr +
+  if OrdCode="" then "" else " (" + OrdCode + ")" endif +
+  if OrdDate="" or ExcludeOrdDate then "" else " ... " + OrdDate endif
+  if match(MLEFStr,TxtStr)=0 then OrdFutureAry[size(OrdFutureAry)+1]=TxtStr endif
+ endif
+endfor
+
+if size(OrdTodayAry)=0 and size(OrdFutureAry)=0 then return "" endif
+TxtAry=array()
+TxtAry[1]=fmt("Other Orders:","B")
+if size(OrdTodayAry)>0 then TxtAry[size(TxtAry)+1]=str(OrdTodayAry,OrdFormat) endif
+if size(OrdFutureAry)>0 then TxtAry[size(TxtAry)+1]="Future Orders:" + spacer + str(OrdFutureAry,OrdFormat) endif
+return str(TxtAry,"\r\n","\r\n","\r\n")
+}
+
+
+/* this fx returns text translation displaying that the following protocols have been addressed */
+fn ccc_CPOE_CDSS_reviewed_text(CDSSReviewed)
+{
+/* CDSSReviewed is DOCUMENT.TEMP_CCC_CDSS_REVIEWED */
+local header
+if CDSSReviewed="" then return "" endif
+if ok(_ccc_CDSS_protocol_txt_reviewed_header) then
+ header=_ccc_CDSS_protocol_txt_reviewed_header
+ if header="" then return "" endif 
+else
+ header="The following protocols were addressed today:"
+endif
+"\r\n" + fmt(header,"B") + "\r\n   " + str(getfield(str(CDSSReviewed),"|",""),"\r\n   ") + "\r\n"
+}
+
+
+/* this fx extracts the text translation from CDSS prompts IF this same text was not inserted into a MLEF;
+CDSSTxtAry is _ccc_CPOE_CDSS_txt_ary which is an array of all text extracted from CDSS protocols which have been executed;
+calls ccc_eval() which prevents err when using eval() and double quotes; requires updated 'CCC-fndef-supplement-3.ccc' file;
+called only from the CPOE A&P-CCC form */
+fn ccc_CPOE_CDSS_non_MLEF_txt(CDSSTxtAry)
+{
+local TxtAryCopy,OldTxt,NewTxt1,NewTxt2,MLEFStr,ct,ct1,txt,temp,removed
+TxtAryCopy=copy(CDSSTxtAry)
+while match(TxtAryCopy,"")>0 do remove(TxtAryCopy,match(TxtAryCopy,""),1) endwhile
+OldTxt=getfield(str(TxtAryCopy,"|"),"|","")
+NewTxt1=array() NewTxt2=array()
+
+/* MLEFStr is a string of all MLEF values */
+MLEFStr=str(DOCUMENT.TEMP_CCC_CPOE_MLEF_1,DOCUMENT.TEMP_CCC_CPOE_MLEF_2,DOCUMENT.TEMP_CCC_CPOE_MLEF_3,DOCUMENT.TEMP_CCC_CPOE_MLEF_4,DOCUMENT.TEMP_CCC_CPOE_MLEF_5,DOCUMENT.TEMP_CCC_CPOE_MLEF_6,DOCUMENT.TEMP_CCC_CPOE_MLEF_7,DOCUMENT.TEMP_CCC_CPOE_MLEF_8,DOCUMENT.TEMP_CCC_CPOE_MLEF_9,DOCUMENT.TEMP_CCC_CPOE_MLEF_10,DOCUMENT.TEMP_CCC_CPOE_MLEF_11,DOCUMENT.TEMP_CCC_CPOE_MLEF_12)
+
+for ct=1, ct<=size(OldTxt), ct=ct+1 do
+ if match(MLEFStr,OldTxt[ct])=0 then
+  /* NewTxt1[] holds text not found in MLEF */
+  NewTxt1[size(NewTxt1)+1]=OldTxt[ct]
+ else
+  /* NewTxt2[] holds text found in MLEF */
+  NewTxt2[size(NewTxt2)+1]=OldTxt[ct]
+ endif
+endfor
+
+if size(NewTxt2)=0 then return str(NewTxt1,"\r\n") + "\r\n" endif
+
+/* Remove item from doc.temps if found in MLEF */
+for ct=1, ct<=5, ct=ct+1 do
+ temp="DOCUMENT.TEMP_CCC_CDSS_TXT_" + ct
+ txt=eval(temp)
+ if txt="" then break endif
+ txt=getfield(txt,"|","")
+ removed=""
+ for ct1=1, ct1<=size(NewTxt2), ct1=ct1+1 do
+  if match(txt,NewTxt2[ct1])>0 then remove(txt,match(txt,NewTxt2[ct1]),1) removed=1 endif
+ endfor
+ if removed=1 then
+  /* reassign CDSS doc.temp with updated text */
+  ccc_eval(temp,str(txt,"|"))
+ endif
+endfor
+/* return text for all items NOT found in a MLEF */
+return str(NewTxt1,"\r\n") + "\r\n"
+}
+
+
+/* this fx is called by the 'Remove Protocols from Note' button (which will be visible
+   only if CDSS text has been inserted); calls ccc_eval() which prevents err when using eval() and double quotes;
+   requires updated 'CCC-fndef-supplement-3.ccc' file */
+fn ccc_CPOE_rem_CDSS_txt()
+{
+local CDSSTxtAry,CopyTxtAry,CDSSReviewedAry,CopyReviewedAry,UsrCkTxtAry,delim,UC,UC1,NewAry,CopyAry,pos,ct,ct1,item,label,gf,num,sz
+local ReviewedHeader
+
+delim=numtoascii(128)
+CDSSTxtAry=copy(_ccc_CPOE_CDSS_txt_ary)
+while match(CDSSTxtAry,"")>0 do remove(CDSSTxtAry,match(CDSSTxtAry,""),1) endwhile
+CDSSTxtAry=getfield(str(CDSSTxtAry,"|"),"|","")
+CDSSReviewedAry=getfield(str(DOCUMENT.TEMP_CCC_CDSS_REVIEWED),"|","")
+
+CopyTxtAry=copy(CDSSTxtAry)
+CopyReviewedAry=copy(CDSSReviewedAry)
+
+CDSSTxtAry=str(CDSSTxtAry,"^")
+CDSSReviewedAry=str(CDSSReviewedAry,"^")
+
+/* the existence of this header determines whether the protocol names will be in the text;
+if this has no value, then the text will not appear; therefore, remove the 'Remove names of protocols addressed from note'
+option from usercheck if this value is empty */
+ReviewedHeader=_ccc_CDSS_protocol_txt_reviewed_header
+
+if CDSSTxtAry="" and (CDSSReviewedAry="" or ReviewedHeader="") then return userok("There is no text to be removed.") endif
+UsrCkTxtAry=array()
+if CDSSReviewedAry<>"" and ReviewedHeader<>"" then UsrCkTxtAry[size(UsrCkTxtAry)+1]="Remove names of 'protocols addressed' from note" endif
+if CDSSTxtAry<>"" then UsrCkTxtAry[size(UsrCkTxtAry)+1]="Remove protocol-specific text from note" endif
+
+UC=usercheck("Select the appropriate item:",str(UsrCkTxtAry,"^"),"Remove Text",delim)
+UC=getfield(UC,delim,"")
+if size(UC)=0 then return "" endif
+
+num=""
+for ct=1, ct<=size(UC), ct=ct+1 do
+ label=UC[ct] + ":\r\n\r\n"
+ cond
+ case UC[ct]="Remove names of 'protocols addressed' from note"
+  item=CDSSReviewedAry CopyAry=copy(CopyReviewedAry) num=1
+ case UC[ct]="Remove protocol-specific text from note"
+  item=CDSSTxtAry CopyAry=copy(CopyTxtAry) num=2
+ endcond
+ UC1=usercheck(label + "Check the boxes for items you want REMOVED from the text.  NOTE: If removed, you must review the protocol again to reinsert the text.",item,"Remove Text",delim)
+
+ gf=getfield(UC1,delim,"")
+ /* remove selected items from CopyAry */
+ for ct1=1, ct1<=size(gf), ct1=ct1+1 do
+  pos=match(CopyAry,gf[ct1])
+  if pos>0 then remove(CopyAry,pos,1) endif
+ endfor
+
+ cond
+ case num=1
+  if size(str(CopyAry,"|"))>1999 then "" else
+   DOCUMENT.TEMP_CCC_CDSS_REVIEWED=str(CopyAry,"|")
+  endif
+ case num=2
+  if size(CopyAry)=0 then
+   DOCUMENT.TEMP_CCC_CDSS_TXT_1=""
+   DOCUMENT.TEMP_CCC_CDSS_TXT_2=""
+   DOCUMENT.TEMP_CCC_CDSS_TXT_3=""
+   DOCUMENT.TEMP_CCC_CDSS_TXT_4=""
+   DOCUMENT.TEMP_CCC_CDSS_TXT_5=""
+  else
+   /* reset doc.temps to new values */
+   NewAry=array()
+   sz=0
+   for ct1=1, ct1<=size(CopyAry), ct1=ct1+1 do
+    if size(str(NewAry,"|")) + size(CopyAry[ct1])<1990 then
+     NewAry[size(NewAry)+1]=CopyAry[ct1]
+    else
+     sz=sz+1 
+     if sz=6 then break endif
+     ccc_eval(str("DOCUMENT.TEMP_CCC_CDSS_TXT_",sz),str(NewAry,"|"))
+     NewAry=array()
+    endif
+   endfor
+   if sz>=5 then "" else
+    sz=sz+1
+    if size(NewAry)>0 then
+     ccc_eval(str("DOCUMENT.TEMP_CCC_CDSS_TXT_",sz),str(NewAry,"|"))
+    endif
+   endif
+   /* reset remainder of doc.temps to null */
+   sz=sz+1
+   while sz<=5 do eval(str("DOCUMENT.TEMP_CCC_CDSS_TXT_",sz,"=\"\"")) sz=sz+1 endwhile
+  endif
+ endcond
+endfor
+return ""
+}
+
+
+/* called within the form as a watcher which then assigns the value of 'Y' or 'N' to DOCUMENT.TEMP_CCC_PSIA_FILES_EXIST
+based on whether the necessary files exist for PSIA content; this doc.temp is then used by ccc_CPOE_exec_PSIA() to
+determine whether the PSIA functionality should be activated;
+this will only occur, however, if the doc.temp for CDSS is set to 'N' (ie, CDSS does not exist);
+09-18-11: updated for LOD version of PSIA content; called by updated CPOE form */
+fn ccc_CPOE_PSIA_active(_LOD)
+{
+/* returns TRUE if PSIA content available; this assumes that CCC-fndef-PSIA.ccc and the 
+user-edit files reside in the CCC folder (not supplement folder) */
+
+local FOPEN,FNAME,path,LOD
+
+/* 09-18-11 */
+LOD=if ok(_LOD) then _LOD else "" endif
+if LOD="" then
+  /* original path and file */
+  path=ccc_sys_path()
+  FNAME="CCC-fndef-PSIA.ccc"
+else
+  /* updated path and file */
+  path=supplement_path()
+  FNAME="CCC-fndef-PSIA-1.ccc"
+endif
+
+FOPEN=fileopen(path + "/" + FNAME,"r")
+if FOPEN="" then return FALSE endif
+fileclose(FOPEN)
+
+path=ccc_sys_path()
+FNAME=str("CCCQE-User-Edit-PSIA-",_ccc_sl_cpoe,".txt")
+FOPEN=fileopen(path + "/" + FNAME,"r")
+if FOPEN="" then return FALSE endif
+fileclose(FOPEN)
+
+return TRUE
+}
+
+
+/* called within the form as a watcher which then assigns the value of 'Y' or 'N' to DOCUMENT.TEMP_CCC_CDSS_FILES_EXIST
+based on whether the necessary files exist for CDSS content; this doc.temp is then used by ccc_CPOE_exec_CDSS() and
+ccc_CPOE_auto_call_CDSS() to determine whether the CDSS functionality should be activated; if so, then the PSIA content
+will NOT be used */
+fn ccc_CPOE_CDSS_active()
+{
+if ok(_ccc_fndef_CDSS_1_ver) and ok(_ccc_fndef_CDSS_2_ver) and ok(_ccc_fndef_CDSS_3_ver) and ok(_ccc_fndef_CDSS_4_ver) and ok(_ccc_CDSS_ary_1) then
+ return TRUE
+else
+ return FALSE
+endif
+}
+
+
+/* this fx causes automatic prompting of CDSS if:
+ 1) user edit global '_ccc_CDSS_auto_fire_LIN' contains either user.loginname or 'ALL'
+ 2) or user checks the 'remind me later' item in usercheck.
+Called in a hidden data display at the top of the form and will trigger only if this form is opened.
+Will not trigger if document is placed on hold, then reopened;
+only called from 'CPOE A&P-CCC' form */
+fn ccc_CPOE_auto_call_CDSS()
+{
+local LINAry,LIN,ProtocolAry,ContToRemindAry,pos
+
+if DOCUMENT.TEMP_CCC_CDSS_FILES_EXIST<>"Y" then return "" endif
+LINAry=getfield(tolower(str(_ccc_CDSS_auto_fire_LIN)),"^","\r\n")
+LIN=user.loginname
+ProtocolAry=getfield(str(DOCUMENT.TEMP_CCC_CPOE_CDSS_PROTO_CT),"|","")
+
+/* ContToRemindAry[] is set when ccc_CDSS_extract() is called and reflects whether the
+'remind me later' item in usercheck has been checked or not */ 
+ContToRemindAry=getfield(str(DOCUMENT.TEMP_CCC_CPOE_CDSS_CONT_TO_REMIND),"|","")
+
+pos=match(ContToRemindAry,LIN)
+
+/* if a user is not listed in the user edit global and if the 'remind me later' item is not checked, then return "" */
+if match(LINAry,"all_users")=0 and match(LINAry,tolower(LIN))=0 and pos=0 then return "" endif
+
+/* if a user has already seen ONE auto occurrance and if the 'remind me later' item is NOT checked, then return "" */
+if match(ProtocolAry,LIN)>0 and pos=0 then return "" endif
+
+ccc_CDSS_extract("SB")
+
+if match(ProtocolAry,LIN)=0 then ProtocolAry[size(ProtocolAry)+1]=LIN endif
+if size(str(ProtocolAry,"|"))>1999 then return "" endif
+DOCUMENT.TEMP_CCC_CPOE_CDSS_PROTO_CT=str(ProtocolAry,"|")
+}
+
+
+/* called within the form and is activated by a selection from the dropdown list; the PSIA functionality will
+   occur only if the CDSS content is NOT available;
+09-18-11: updated for LOD version of PSIA content; called by updated CPOE form;
+  added MedLstChanges (value is already present in this positon) and new arg: _LOD */
+fn ccc_CPOE_exec_PSIA(Problem,FormTag,MedLstChanges,_LOD)
+{
+local FormName,LOD
+if DOCUMENT.TEMP_CCC_CDSS_FILES_EXIST="Y" then return "" endif
+if DOCUMENT.TEMP_CCC_PSIA_FILES_EXIST<>"Y" then return "" endif
+if Problem="" then return "" endif
+cond
+case FormTag="CPOE" FormName="CPOE A&P-CCC"
+case FormTag="CPO2" FormName="CPOE A&P-Addendum-CCC"
+endcond
+
+/* 09-18-11 */
+LOD=if ok(_LOD) then _LOD else "" endif
+cond
+case LOD=""
+  /* original version */
+  ccc_PSIA_extr(Problem,_ccc_sl_cpoe,FormName,"")
+case LOD<>""
+  /* updated version defined in CCC-fndef-PSIA-1.ccc */
+  ccc_PSIA_1_extr(Problem,_ccc_sl_cpoe,FormName,"")
+endcond
+}
+
+
+/* called within the form and is activated by a selection from the dropdown list; if the CDSS functionality is active,
+   then the PSIA functionality will not be used */
+fn ccc_CPOE_exec_CDSS(Problem,Position,FormTag)
+{
+/* calls ccc_eval() which prevents err when using eval() and double quotes; requires updated 'CCC-fndef-supplement-3.ccc' file */
+local txt,TxtAry,MLEF,ct,ct1,gf,pos
+if Problem="" then return "" endif
+if DOCUMENT.TEMP_CCC_CDSS_FILES_EXIST<>"Y" then return "" endif
+txt=ccc_CDSS_extract(Problem)
+if txt="" then return "" endif
+
+TxtAry=getfield(txt,"|","")
+MLEF=getfield(eval(str("DOCUMENT.TEMP_CCC_",FormTag,"_MLEF_",Position)),"\n","\r")
+while size(MLEF)>0 do
+ if MLEF[size(MLEF)]="" then remove(MLEF,size(MLEF),1) else break endif
+endwhile
+MLEF[size(MLEF)+1]=str(TxtAry,"\r\n")
+MLEF=str(MLEF,"\r\n") + "\r\n"
+
+/* 'txt' MAY contain double quotes since obs terms may be evaluated */
+ccc_eval(str("DOCUMENT.TEMP_CCC_",FormTag,"_MLEF_",Position),MLEF)
+
+/* refresh */
+add_text_comp("Enterprise\CCC\System","Refresh")
+
+/* remove item from these doc.temps (if present) since it is being added to MLEF */
+for ct=1, ct<=5, ct=ct+1 do
+ gf=getfield(eval(str("DOCUMENT.TEMP_CCC_CDSS_TXT_",ct)),"|","")
+ if size(gf)=0 then return "" endif
+ for ct1=1, ct1<=size(TxtAry), ct1=ct1+1 do
+  pos=match(gf,TxtAry[ct1])
+  if pos>0 then remove(gf,pos,1) endif
+ endfor
+ ccc_eval(str("DOCUMENT.TEMP_CCC_CDSS_TXT_",ct),str(gf,"|"))
+endfor
+}
+
+
+/* called by the 'Prob List' buttons; once the problem list has been accessed, the triggering global
+will ensure that the necessary assessment-due globals have been updated */
+fn ccc_CPOE_update_prob()
+{
+update_problems()
+_ccc_CPOE_update_prob_trigger=val(str(_ccc_CPOE_update_prob_trigger))+1
+}
+
+
+/*
+Called by 'Enter Charges' button to extract all dx found in all dropdown lists
+and to do one of the following:
+1) open an encounter form: if so, then load the form;
+also assign the selected Dxs to DOCUMENT.TEMP_CCC_CPOE_DX_FOR_EM_ORDERS to be used by the loaded form;
+this is done by the form calling the updated ccc_mel_add_order() to look for this doc.temp and, if found,
+look to see if an E&M item (user-defined in CCCQE-User-Edit-Site-Specific-1.txt) is being ordered.
+If so, then apply all these Dx to that E&M order; therefore, this can be used by any form calling ccc_mel_add_order.
+2) open another usercheck popup box to select a single Order description and then use the selected
+Dxs to push to orders.
+3) Page refresh is done after usercheck is called to prevent the ghost-like appearance of the screen; open_form_comp is called in specific
+locations to prevent being kicked out (which seems to be the result of calling this immediately after userok)
+*/
+
+fn ccc_CPOE_exec_order_charges(FormTag,PageNum)
+{
+local ct,UC,OrderChargeGF,FormToLoad,ChargeAry,gf,DxDescrAry,DxCodeAry,UEMaxNumDx,MaxNumDx
+local OrdCatAry,OrdTypeAry,OrdDescrAry,OrdCat,OrdType,OrdDescr,pos,sz,UCDxForOrders,UCDxForOrdersGF,MAO,ErrAry
+local PageAry,Page,FormName,GoTo
+
+/* extract values for open_form_comp */
+cond
+case FormTag="CPOE"
+ PageAry=array("A&P 1-2","A&P 3-4","A&P 5-6","A&P 7-8","A&P 9-10","A&P 11-12")
+ FormName="CPOE A&P-CCC"
+case FormTag="CPO2"
+ PageAry=array("A&P 13-14","A&P 15-16","A&P 17-18","A&P 19-20","A&P 21-22","A&P 23-24")
+ FormName="CPOE A&P-Addendum-CCC"
+endcond
+Page=PageAry[PageNum]
+
+/* user-defined maximum number of Dx which can be pushed to an E&M order */
+UEMaxNumDx=val(ccc_SiteSpec_extr_content("EM_ORDER_MAX_DX_NUM",""))
+
+/* utility fx which extracts all selected dx from the initial usercheck popup box */
+UCDxForOrders=ccc_CPOE_extr_Dx_for_EM_orders_util(UEMaxNumDx)
+
+if UCDxForOrders="" then
+ /* refresh page */
+ open_form_comp(str("Enterprise\\CCC\\",FormName),Page)
+ return ""
+endif
+
+/* user-defined criteria for order charges to EITHER load an encounter form OR
+call a second usercheck popup box containing an E&M order selection */
+OrderChargeGF=getfield(ccc_SiteSpec_extr_content("CPOE_ORDER_CHARGES",""),"|","")
+
+if size(OrderChargeGF)<2 then
+ userok("Order charges have not been defined in the 'CCCQE-User-Edit-Site-Specific-1.txt' file.")
+ return ""
+endif
+
+/* selected problems from the initial usercheck */
+UCDxForOrdersGF=getfield(UCDxForOrders,"|","")
+
+/* MaxNumDx is the number of diagnoses which can be used for orders */
+MaxNumDx=UEMaxNumDx
+if UEMaxNumDx=0 or UEMaxNumDx>size(UCDxForOrdersGF) then
+ /* reset MaxNumDx to appropriate number */
+ MaxNumDx=size(UCDxForOrdersGF)
+endif
+
+/* these 2 arrays will hold the DxDescr and DxCode values extracted from each problem (Dx Descr (code)) */
+DxDescrAry=array()
+DxCodeAry=array()
+for ct=1, ct<=MaxNumDx, ct=ct+1 do
+ /* new utility fx defined in CCC-fndef-supplement-3.ccc which will extract the Dx descr and code
+    from a problem which is in the following format: Dx Descr (code);
+    returns an array: array[1]=DxDescr; array[2]=DxCode */
+ DxDescrCodeAry=ccc_DxDescrCodeAry_util(UCDxForOrdersGF[ct])
+ if size(str(str(DxDescrAry),str(DxCodeAry),str(DxDescrCodeAry)))>1995 then break endif
+ DxDescrAry[ct]=DxDescrCodeAry[1]
+ DxCodeAry[ct]=DxDescrCodeAry[2]
+endfor
+
+cond
+
+/* user-edit criteria to load an encounter form */
+case OrderChargeGF[1]="EF_LOAD"
+ /* this doc.temp will hold the Dx descr and codes which have already been formatted;
+    will be called by ccc_mel_add_order() so various forms can use this; ccc_mel_add_order() will
+    uses these Dxs only if the order being committed matches order descriptions found in the
+    item for 'EM_ORDER_DEFINITION' defined in CCCQE-User-Edit-Site-Specific-1.txt */
+ DOCUMENT.TEMP_CCC_CPOE_DX_FOR_EM_ORDERS=str(str(DxDescrAry,"|"),"^",str(DxCodeAry,"|"))
+ /* extract form name and path */
+ FormToLoad=copy(OrderChargeGF[2])
+
+ /* 12-19-11: ensure this is called before loading a form */
+ GoTo=match(getfield(tolower(FormToLoad),"^~",""),"open")
+
+ if GoTo>0 then
+  cond
+  case PageNum=1 ccc_CPOE_ClosePage(1,2,FormTag)
+  case PageNum=2 ccc_CPOE_ClosePage(3,4,FormTag)
+  case PageNum=3 ccc_CPOE_ClosePage(5,6,FormTag)
+  case PageNum=4 ccc_CPOE_ClosePage(7,8,FormTag)
+  case PageNum=5 ccc_CPOE_ClosePage(9,10,FormTag)
+  case PageNum=6 ccc_CPOE_ClosePage(11,12,FormTag)
+  endcond
+ endif
+
+ /* load form
+ 03-02-12: added FormName */
+ ccc_SiteSpec_AB("EF",FormToLoad,FormName)
+ if GoTo>0 then return "" endif
+
+ /* refresh page */
+ open_form_comp(str("Enterprise\\CCC\\",FormName),Page)
+
+/* user-edit criteria to call a prompt (usercheck) */
+case OrderChargeGF[1]="PROMPT"
+ /* this holds content for each of the order charges which is to appear in usercheck */
+ ChargeAry=getfield(OrderChargeGF[2],"^","")
+ OrdCatAry=array()
+ OrdTypeAry=array()
+ OrdDescrAry=array()
+ /* extract individual components of each order charge: category, type, and descr */
+ for ct=1, ct<=size(ChargeAry), ct=ct+1 do
+  gf=getfield(ChargeAry[ct],"~","")
+  if size(gf)<3 then continue endif
+  sz=size(OrdCatAry)+1
+  OrdCatAry[sz]=gf[1]
+  OrdTypeAry[sz]=gf[2]
+  OrdDescrAry[sz]=gf[3]
+ endfor
+ /* call usercheck a 2nd time; each listing will be the order description (E&M charge)
+    extracted from user-edit criteria */
+ UC=usercheck("Select the SINGLE applicable charge for today's visit:",str(OrdDescrAry,"^"),"Select Charge Code","|")
+
+ if UC="" then
+  /* refresh page */
+  open_form_comp(str("Enterprise\\CCC\\",FormName),Page)
+  return ""
+ endif
+
+ if size(getfield(UC,"|",""))>1 then
+  /* the userok modal box appears to prevent the need for page refresh */
+  userok("You must select only ONE order charge !")
+  return ""
+ endif
+
+ pos=match(OrdDescrAry,UC)
+ if pos>0 then
+  OrdCat=OrdCatAry[pos]
+  OrdType=OrdTypeAry[pos]
+  OrdDescr=OrdDescrAry[pos]
+  /* prevent duplicates */
+  if match(tolower(orders_new("delimited")),tolower(str(OrdDescr,"^",OrdType)))=0 then
+   MAO=ccc_mel_add_order(OrdType,OrdCat,OrdDescr,"",str(DxCodeAry,"|"),str(DxDescrAry,"|"))
+   if MAO<>"0" then
+    ErrAry=array(str(OrdDescr,"^",MAO))
+    ccc_MAO_err(ErrAry)
+   endif
+  endif
+ endif
+
+ /* refresh page */
+ open_form_comp(str("Enterprise\\CCC\\",FormName),Page)
+
+endcond
+}
+
+
+/* util fx called by ccc_CPOE_exec_order_charges() which returns the selected diagnoses from the initial usercheck */
+fn ccc_CPOE_extr_Dx_for_EM_orders_util(_UEMaxNumDx)
+{
+local DxForOrdersAry,ct,ct1,DLAry,DL,UCMaxNumDx,UCHeading,UCDxForOrders,UCDxForOrdersStr,pos
+
+DxForOrdersAry=array()
+for ct=1, ct<=2, ct=ct+1 do
+ cond
+ case ct=1 DLAry=copy(_ccc_CPOE_dropdown_ary)
+ case ct=2 DLAry=copy(_ccc_CPO2_dropdown_ary)
+ endcond
+ if str(DLAry,"")="" then continue endif
+ for ct1=1, ct1<=12, ct1=ct1+1 do
+  DL=str(DLAry[ct1])
+  if DL="" then continue endif
+  DxForOrdersAry[size(DxForOrdersAry)+1]=str(DL,"+")
+ endfor
+endfor
+if size(DxForOrdersAry)=0 then
+ userok("No problems have been selected for charges.")
+ return ""
+endif
+
+/* _UEMaxNumDx is user-defined maximum number of Dx which can be pushed to orders */
+UCMaxNumDx=""
+if _UEMaxNumDx>0 then
+ if size(DxForOrdersAry)>_UEMaxNumDx then UCMaxNumDx=str(_UEMaxNumDx) endif
+endif
+
+/* call initial usercheck to select (or de-select) problems which have been assessed in the form */
+UCHeading=
+"The following problems have been assessed and will be included in today's E&&M charge.\r\n" +
+"Uncheck any problems you DO NOT want to include." +
+if UCMaxNumDx="" then "" else "\r\n* * * *  MAXIMUM number of selections allowed is " + UCMaxNumDx + "  * * * *" endif
+
+/* 05-21-11: this will allow & to appear in usercheck box and prevent it from appearing as an underscore */
+UCDxForOrdersStr=str(DxForOrdersAry,"^")
+UCDxForOrdersStr=str(getfield(UCDxForOrdersStr,"&",""),"&&")
+
+UCDxForOrders=usercheck(UCHeading,UCDxForOrdersStr,"Select Problems for E&M Charge","|","/s")
+
+/* 05-21-11: all subsequent double && (after the initial one) will still be returned as && instead of &;
+   need to convert all double && to single & AFTER usercheck is called */
+pos=match(UCDxForOrders,"&")
+if pos>0 then
+ pos=match(UCDxForOrders,pos+1,"&&")
+ while pos>0 do
+  UCDxForOrders=remove(UCDxForOrders,pos,1)
+  pos=match(UCDxForOrders,pos+1,"&&")
+ endwhile
+endif
+
+return UCDxForOrders
+}
+
+
+/* returns 1 if an order needs to be added based on dropdown list selections AND user-edit criteria for 'E&M' charges;
+   08-30-11: modified for quicker matching */
+fn ccc_CPOE_order_charges_vis()
+{
+local EMOrdGF,EMOrdStr,ct,OrdAftDelimGF,tda,pos
+
+/* no dropdown list items have been selected */
+if str(str(_ccc_CPOE_dropdown_ary,""),str(_ccc_CPO2_dropdown_ary,""))="" then return "" endif
+
+/* extract E&M order descriptions from user-edit file */
+EMOrdGF=getfield(tolower(ccc_SiteSpec_extr_content("EM_ORDER_DEFINITION","")),"^","")
+
+/* 07-22-11: remove empty array elements */
+while match(EMOrdGF,"")>0 do remove(EMOrdGF,match(EMOrdGF,""),1) endwhile
+
+/* E&M order descriptions have not been defined in user-edit file */
+if size(EMOrdGF)=0 then return "" endif
+
+/* 12-14-11: changed to orders_new so that this fx will trigger with each update ON THE SAME DAY;
+   will still check for date comparison below since orders_after is sometimes returned when orders_new is called */
+OrdAftDelimGF=getfield(tolower(orders_new("delimited")),"|^","")
+
+/* since at least one assessment dropdown list contains a value and NO orders found, then return 1 */
+if size(OrdAftDelimGF)=0 then return 1 endif
+
+tda=sub(str(document.clinicaldate),1,10)
+
+for ct=1, ct<=size(EMOrdGF), ct=ct+1 do
+ EMOrdStr=EMOrdGF[ct]
+ pos=match(OrdAftDelimGF,EMOrdStr)
+ while pos>0 do
+  if pos+3>size(OrdAftDelimGF) then break endif
+  /* now that a match has been found, be sure it has the document date */
+  if OrdAftDelimGF[pos+3]=tda then return "" endif
+  pos=match(OrdAftDelimGF,pos+1,EMOrdStr)
+ endwhile
+endfor
+return 1
+}
+
+	
