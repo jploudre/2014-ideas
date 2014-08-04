@@ -1,0 +1,15 @@
+{fn H(){
+local i, h=array("High-risk Co-morbidities (not recently discussed):"), c=getfield(PROBLEM_CUST_LIST('*FCN Diagnosis List-HCC','D'),"|^",""), a=getfield(str(sub(ccc_CPOE_AssessmentsDue_util(180),2,1),","),"^,","")
+for i=1,i<(size(a)+1),i=i+1
+do
+if size(a[i])>5 then
+if sub(a[i],1,4)="ICD-" then
+if match(c,1,a[i])>0 then
+insert(h,2,(HRET+"* "+str(c[match(c,1,a[i])-1])))
+endif
+endif
+endif
+endfor
+if size(h)=1, return ""
+return str(h," ")
+}}{H()}
