@@ -41,6 +41,9 @@ Rwin::
 Run unfocus.exe
 return
 
+Esc::PatternHotKey(".->SwapSticky()")
+;+CapsLock::PatternHotKey(".->SendSticky()")
+
 #IfWinActive, End Update
 \::PatternHotKey(".->HoldUpdate", "..->SendToBrandie")
 return
@@ -66,6 +69,8 @@ IfWinNotExist, Update
 	Click, 13, %ypos%
 }
 return
+Esc::PatternHotKey(".->SwapSticky()")
+;+CapsLock::PatternHotKey(".->SendSticky()")
 
 #IfWinActive, Centricity Practice Solution Browser:
 \::
@@ -103,8 +108,7 @@ return
 
 
 
-CapsLock::PatternHotKey(".->SwapSticky()")
-+CapsLock::PatternHotKey(".->SendSticky()")
+
 
 SwapSticky()
 {
