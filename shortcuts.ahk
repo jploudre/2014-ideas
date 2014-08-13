@@ -479,3 +479,7 @@ return
 SendInput Upcoming Appointment. ............................ Jonathan Ploudre, MD. %A_MMM% %A_DD%, %A_YYYY%
 Send !s
 return
+::sljkp::
+SendInput Send Letter with results. ............................ Jonathan Ploudre, MD. %A_MMM% %A_DD%, %A_YYYY%
+Send !s
+return
