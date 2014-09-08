@@ -1,0 +1,7 @@
+Orders Utox and reminds to associate and sign.
+
+{fn R() {
+MEL_ADD_ORDER("S", "Laboratory", "80104 - Drug Screen, qualitative; multiple drug classes**","","","","","1","N","",str(._TODAYSDATE))
+USEROK(HRET + HRET + "Now Do This:" + HRET + "* Associate diagnosis"+ HRET + HRET)
+Update_orders()
+return ""}}{R()}Urine Toxicology performed.
