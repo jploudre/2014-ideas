@@ -1,0 +1,10 @@
+Creates simple list of medications for quick review. 
+
+{fn H(){local i, j, meds=getfield(MEDS_After("delim"),"|","" ), output
+for i=1, i < size(meds), i = i+1
+do
+meds[i] = getfield(meds[i],"^","")
+output = output + meds[i][2] + HRET
+endfor
+return output
+}}{H()}
