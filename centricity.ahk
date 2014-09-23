@@ -1,27 +1,5 @@
 CoordMode, Mouse, Window
-FileRead, PECCC, PE-CCC.csv
 Setkeydelay 200
-PreviousExamTab := 0
-
-; Scratch Pad Bits
-nobevel = -E0x200
-; Colors from http://ethanschoonover.com/solarized
-base2 = eee8d5
-base3 = fdf6e3
-base02 = 073642
-
-Gui, +AlwaysOnTop -Caption +ToolWindow Border
-GUI, margin, 0,0
-gui, color, %base2%, %base3%
-gui, font, s18 q4 w700 c%base02%, Tahoma
-Gui, Add, Edit, vScratchpadContents x0 y0 W600 h372 %nobevel%
-
-;Gui +LastFound
-;GUI_ID:=WinExist()
-;Gui, Show, xCenter y%fromtopposition% w%windowwidth% h%fullboxheight% Hide, Scratchpad
-;DllCall("AnimateWindow","UInt",GUI_ID,"Int",200,"UInt","0xa0000")
-
-
 return
 
 #IfWinActive, Update
@@ -41,21 +19,8 @@ Rwin::
 Run unfocus.exe
 return
 
-;Esc::PatternHotKey(".->SwapSticky()")
-;+CapsLock::PatternHotKey(".->SendSticky()")
-
 #IfWinActive, End Update
 \::PatternHotKey(".->HoldUpdate", "..->SendToBrandie")
-return
-
-!+h::
-Click, 316, 351
-WinWaitNotActive
-SendInput Freema{Enter}
-Sleep, 50
-Click, 240, 345
-WinWaitNotActive
-Click, 301, 506
 return
 
 #IfWinActive, Chart
@@ -69,14 +34,13 @@ IfWinNotExist, Update
 	Click, 13, %ypos%
 }
 return
-;Esc::PatternHotKey(".->SwapSticky()")
-;+CapsLock::PatternHotKey(".->SendSticky()")
 
 #IfWinActive, Centricity Practice Solution Browser:
 \::
 Send !{F4}
 return
 
+; Add Arrow keys to make organizing problem lists quicker. 
 #IfWinActive, Update Problems
 ; Long Hold is Top/Bottom. Tap is Up/Down
 Up::PatternHotKey(".->UpdateProblemsUp","_->UpdateProblemsTop")
@@ -103,71 +67,11 @@ return
 Send !s
 return
 
+; End of Window Specific Hotkeys. 
 #IfWinActive
 
-
-
-
-
-
-SwapSticky()
-{
-global fromtopposition
-global windowwidth
-global fullboxheight
-
-IfWinActive, Scratchpad
-{
-Gui, Show, xCenter y10 w600 h372 Hide, Scratchpad
-return
-}
-Gui, Show, xCenter y10 w600 h372, Scratchpad
-}
-return
-
-SendSticky()
-{
-global ScratchpadContents
-GUI, submit
-Clip(ScratchpadContents)
-ScratchpadContents =
-}
-return
-
-
-F2::
-ExamClick(1)
-ExamClick(2)
-ExamClick(3)
-ExamClick(4)
-ExamClick(5)
-ExamClick(6)
-ExamClick(10)
-ExamClick(11)
-ExamClick(21)
-ExamDone()
-return
-
-+F2::
-ExamClick(1)
-ExamClick(10)
-ExamClick(11)
-ExamClick(24)
-ExamDone()
-return
-
-F1::
-ExamClick(1, 1)
-ExamDone()
-return
-
-+F1::
-ExamClick(1, "No Specific Exam today, counselling visit.")
-ExamDone()
-return
-
 F10::
-; Send a patient a letter
+; Send a patient a blank letter
 Send ^p
 Sleep 100
 Send l
@@ -198,7 +102,7 @@ return
 ; Shift Ctrl-a: Open Append
 ^+a::
 ; Doesn't check location precisely yet, Assumes in Desktop:Documents
-; Three Finger TipTap Middle
+; Used with Gesture: Three Finger TipTap Middle
 
 IfWinActive, Chart
 	{
@@ -213,7 +117,7 @@ return
 ; Shift Ctrl-O: Open Attachment
 ^+o::
 ; Doesn't check location precisely yet, Assumes in Desktop:Documents
-; Two Finger 'Right TipTap
+; Used with Gesture: Two Finger 'Right TipTap
 
 IfWinActive, Chart
 	{
@@ -254,80 +158,6 @@ IfWinActive, End Update ; Signs Document
 return
 
 ; Functions
-
-ExamClick(Theline, howtohandle := 0)
-{
-	global
-	; Hardwire the PECCC
-	Loop, parse, PECCC, `n, `r
-	{
-		if (theline != A_Index)
-		continue
-		else
-		{
-		loop, parse, A_Loopfield, CSV
-		{
-			if (A_Index = "1"){
-			CurrentExamTab := A_LoopField
-			}
-			if (A_Index = "2"){
-			}
-			if (A_Index = "3"){
-			ExamTabxpos := A_LoopField
-			}
-			if (A_Index = "4"){
-			ExamTabypos := A_LoopField
-			}
-			if (A_Index = "5"){
-			ExamSectionNormalxpos := A_LoopField
-			}
-			if (A_Index = "6"){
-			ExamSectionNormalypos := A_LoopField
-			}
-			if (A_Index = "7"){
-			ExamSectionTextxpos := A_LoopField
-			}
-			if (A_Index = "8"){
-			ExamSectionTextypos := A_LoopField
-			}
-		}
-		}
-		
-	}
-	If (CurrentExamTab != PreviousExamTab)
-	{
-	Click %ExamTabxpos%, %ExamTabypos%
-	Sleep 500
-	; Now Set the Previous Tab
-	PreviousExamTab := CurrentExamTab
-	}
-	if (howtohandle = 0) ; Default is Normal
-	{
-	Click %ExamSectionNormalxpos%, %ExamSectionNormalypos%
-	Sleep 300
-	return
-	}
-	if (howtohandle = 1) ; Select the field (use for last item)
-	{
-	Click %ExamSectionTextxpos%, %ExamSectionTextypos%
-	Sleep 300
-	return	
-	}
-	else
-	{
-	Click %ExamSectionTextxpos%, %ExamSectionTextypos%
-	Sleep 300
-	Clip(howtohandle)
-	return	
-	}
-}
-
-ExamDone()
-{
-	global
-	PreviousExamTab := 0
-}
-
 GotoChart:
 WinActivate, Chart
 return
@@ -369,25 +199,20 @@ return
 UpdateProblemsTop:
 Click, 762, 100
 return
-
 UpdateProblemsBottom:
 Click, 762, 189
 return
-
 UpdateProblemsUp:
 Click, 762, 122
 return
-
 UpdateProblemsDown:
 Click, 762, 170
 return
-
 UpdateProblemsRemove:
 Click, 508, 572
 WinWaitNotActive
 Send {Enter}
 return
-
 
 ; Downloaded Functions ----------------------------------------------------------------------------------
 
@@ -517,12 +342,6 @@ PatternHotKey(arguments*)
                 continue
         }
 
-        ; Convert pattern to regular expression
-        ;
-        ; Note: Treat '~' as an escape character for custom regular expressions.
-        ;       Custom regular expressions can't have the pattern length
-        ;       automatically calculated, so the length parameter might be
-        ;       necessary.
         if ( Asc(pattern) = Asc("~") )
             pattern := SubStr(pattern, 2)
         else
