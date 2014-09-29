@@ -9,13 +9,7 @@ SetKeyDelay, 200
 Return
 
 ; Usability. Ignore Winkey, additional keys.
-<#Esc::run taskmgr.exe
-<#Up::Send {PgUp}
-<#Down::Send {PgDn}
-<#Backspace::Send {Delete}
-RWin::return
-LWin::return
-#L::return
+
 
 #Include i'mdone2(7).ahk
 

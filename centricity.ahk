@@ -2,6 +2,14 @@ CoordMode, Mouse, Window
 Setkeydelay 200
 return
 
+<#Esc::run taskmgr.exe
+<#Up::Send {PgUp}
+<#Down::Send {PgDn}
+<#Backspace::Send {Delete}
+RWin::return
+LWin::return
+#L::return
+
 #IfWinActive, Update
 `::PatternHotKey(".->GotoChart","..->SwapTextView")
 return
