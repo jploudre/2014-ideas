@@ -496,3 +496,12 @@ return
 SendInput Send Letter with results. ............................ Jonathan Ploudre, MD. %A_MMM% %A_DD%, %A_YYYY%
 Send !s
 return
+::cdn::
+SendInput Call Doctor Note:{Enter 2}SITUATION:{Enter 3}BACKGROUND:{Enter 3}ASSESSMENT:{Enter 3}RECOMENDATION:{Enter 2}{Up 10}
+return
+:r:sbar::
+SendInput SITUATION:{Enter 3}BACKGROUND:{Enter 3}ASSESSMENT:{Enter 3}RECOMENDATION:{Enter 2}{Up 10}
+return
+::sdjkp::
+SendInput /JKP %A_MMM% %A_DD%, %A_YYYY%
+return
