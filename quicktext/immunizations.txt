@@ -1,0 +1,30 @@
+oppsv Orders Pneumococcal Immunization.
+
+{fn R() {
+MEL_ADD_ORDER("S", "Immunizations/Vaccines", "90732 - Pneumococcal Vaccine, Adult**","","ICD-V70.0","HEALTH MAINTENANCE","","1","N","",str(._TODAYSDATE))
+MEL_ADD_ORDER("S", "Immunizations/Vaccines", "90471 - Imm Admin, 1st vaccine **","","ICD-V70.0","HEALTH MAINTENANCE","","1","N","",str(._TODAYSDATE))
+return "Pneumococcal Vaccine given today (Non-Medicare)."}}{R()}
+
+
+oppsvm Orders Pneumoccal Immunization for Medicare
+
+{fn R() {
+MEL_ADD_ORDER("S", "Immunizations/Vaccines", "90732 - Pneumococcal Vaccine, Adult**","","ICD-V70.0","HEALTH MAINTENANCE","","1","N","",str(._TODAYSDATE))
+MEL_ADD_ORDER("S", "Immunizations/Vaccines", "G0009 - Admin Pneumococcal Vaccine-Medicare**","","ICD-V70.0","HEALTH MAINTENANCE","","1","N","",str(._TODAYSDATE))
+return "Pneumococcal Vaccine given today (Medicare)."}}{R()}
+
+otdap Orders TDAP Immunization
+
+{fn R() {
+MEL_ADD_ORDER("S", "Immunizations/Vaccines", "90715 - Tdap Vaccine, 7+ years**","","ICD-V70.0","HEALTH MAINTENANCE","","1","N","",str(._TODAYSDATE))
+MEL_ADD_ORDER("S", "Immunizations/Vaccines", "90471 - Imm Admin, 1st vaccine **","","ICD-V70.0","HEALTH MAINTENANCE","","1","N","",str(._TODAYSDATE))
+return "TDAP given today."}}{R()}
+
+oflum Orders Medicare Flu
+
+{fn R() {
+MEL_ADD_ORDER("S", "Immunizations/Vaccines", "90686 - Flu Vaccine, PRESERVATIVE FREE, Quadrivalent**","","ICD-V70.0","HEALTH MAINTENANCE","","1","N","",str(._TODAYSDATE))
+MEL_ADD_ORDER("S", "Immunizations/Vaccines", "G0008 - Admin Influenza Vaccine-Medicare**","","ICD-V70.0","HEALTH MAINTENANCE","","1","N","",str(._TODAYSDATE))
+return "Influenza Vaccine given today (Medicare)."}}{R()}
+
+

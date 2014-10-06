@@ -1,5 +1,5 @@
 CoordMode, Mouse, Window
-Setkeydelay 200
+SetKeyDelay, 200
 return
 
 <#Esc::run taskmgr.exe
