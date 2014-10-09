@@ -1,0 +1,9 @@
+owcc Order Well Child Check Age-adjusted Code for Established Patients
+
+{fn W() {local o=" - Preventive Care, ",a=PATIENT_AGE(),e=" - EST Pt**",t=array("under 1 y/o","1-4 y/o","5-11 y/o","12-17 y/o"),b="9939",n=array("1","2","3","4"),i=0
+if (a<1),i=1,i=2
+if (a>4),i=3
+if (a>11),i=4
+o=b+n\[i\]+o+t\[i\]+e
+MEL_ADD_ORDER("S","Preventive Care/Counseling",o,"","ICD-V20.2","Well Child","","","")
+return ""}}{W()}
