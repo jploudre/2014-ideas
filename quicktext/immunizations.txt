@@ -20,11 +20,22 @@ MEL_ADD_ORDER("S", "Immunizations/Vaccines", "90715 - Tdap Vaccine, 7+ years**",
 MEL_ADD_ORDER("S", "Immunizations/Vaccines", "90471 - Imm Admin, 1st vaccine **","","ICD-V70.0","HEALTH MAINTENANCE","","1","N","",str(._TODAYSDATE))
 return "TDAP given today."}}{R()}
 
-oflum Orders Medicare Flu
+oflu Orders Flu Vaccination Trivalent (Adult)
 
 {fn R() {
-MEL_ADD_ORDER("S", "Immunizations/Vaccines", "90686 - Flu Vaccine, PRESERVATIVE FREE, Quadrivalent**","","ICD-V70.0","HEALTH MAINTENANCE","","1","N","",str(._TODAYSDATE))
+MEL_ADD_ORDER("S", "Immunizations/Vaccines", "90471 - Imm Admin, 1st vaccine **", "", "ICD-V70.0", "HEALTH MAINTENANCE", "", "1", "N", "",str(._TODAYSDATE))
+MEL_ADD_ORDER("S", "Immunizations/Vaccines", "90656 - Flu Vaccine, PRESERVATIVE FREE, Trivalent**", "", "ICD-V70.0", "HEALTH MAINTENANCE", "", "1", "N", "",str(._TODAYSDATE))
+return "Influenza Vaccine (Trivalent, Preservative Free) given today."}}{R()}
+
+oflum Orders Medicare Flu Trivalent
+
+{fn R() {
+MEL_ADD_ORDER("S", "Immunizations/Vaccines", "90656 - Flu Vaccine, PRESERVATIVE FREE, Trivalent**", "", "ICD-V70.0", "HEALTH MAINTENANCE", "", "1", "N", "",str(._TODAYSDATE))
 MEL_ADD_ORDER("S", "Immunizations/Vaccines", "G0008 - Admin Influenza Vaccine-Medicare**","","ICD-V70.0","HEALTH MAINTENANCE","","1","N","",str(._TODAYSDATE))
-return "Influenza Vaccine given today (Medicare)."}}{R()}
+return "Influenza Vaccine given today (Medicare, Trivalent Preservative Free)."}}{R()}
+
+{fn R() {
+MEL_ADD_ORDER("S", "Laboratory", "82274 - Blood Occult iFob; COLORECTAL SCREENING**", "", "ICD-V70.0", "HEALTH MAINTENANCE", "", "1", "N", "",str(._TODAYSDATE))
+return "Fit Letter sent notifying patient of negative results."}}{R()}
 
 
