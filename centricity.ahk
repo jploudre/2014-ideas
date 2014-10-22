@@ -1,5 +1,5 @@
 CoordMode, Mouse, Window
-SetKeyDelay, 200
+SetKeyDelay, 20
 return
 
 <#Esc::run taskmgr.exe
@@ -497,19 +497,19 @@ KeyPressPattern(length = 2, period = 0.2)
 ::3xbp:: Average of 3 automated readings with 60 second pause between readings.
 ::3bp:: 3 blood pressures were measured 1 minute apart and averaged.
 ::ujkp::
-SendInput Upcoming Appointment. ............................ Jonathan Ploudre, MD. %A_MMM% %A_DD%, %A_YYYY%
+Send Upcoming Appointment. ............................ Jonathan Ploudre, MD. %A_MMM% %A_DD%, %A_YYYY%
 Send !s
 return
 ::sljkp::
-SendInput Send Letter with results. ............................ Jonathan Ploudre, MD. %A_MMM% %A_DD%, %A_YYYY%
+Send Send Letter with results. ............................ Jonathan Ploudre, MD. %A_MMM% %A_DD%, %A_YYYY%
 Send !s
 return
 ::cdn::
-SendInput Call Doctor Note:{Enter 2}SITUATION:{Enter 3}BACKGROUND:{Enter 3}ASSESSMENT:{Enter 3}RECOMENDATION:{Enter 2}{Up 10}
+Send Call Doctor Note:{Enter 2}SITUATION:{Enter 3}BACKGROUND:{Enter 3}ASSESSMENT:{Enter 3}RECOMENDATION:{Enter 2}{Up 10}
 return
 :r:sbar::
-SendInput SITUATION:{Enter 3}BACKGROUND:{Enter 3}ASSESSMENT:{Enter 3}RECOMENDATION:{Enter 2}{Up 10}
+Send SITUATION:{Enter 3}BACKGROUND:{Enter 3}ASSESSMENT:{Enter 3}RECOMENDATION:{Enter 2}{Up 10}
 return
 ::sdjkp::
-SendInput /JKP %A_MMM% %A_DD%, %A_YYYY%
+Send /JKP %A_MMM% %A_DD%, %A_YYYY%
 return
