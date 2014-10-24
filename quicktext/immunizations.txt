@@ -18,7 +18,9 @@ otdap Orders TDAP Immunization
 {fn R() {
 MEL_ADD_ORDER("S", "Immunizations/Vaccines", "90715 - Tdap Vaccine, 7+ years**","","ICD-V70.0","HEALTH MAINTENANCE","","1","N","",str(._TODAYSDATE))
 MEL_ADD_ORDER("S", "Immunizations/Vaccines", "90471 - Imm Admin, 1st vaccine **","","ICD-V70.0","HEALTH MAINTENANCE","","1","N","",str(._TODAYSDATE))
-return "TDAP given today."}}{R()}
+OBSNOW("TDBOOSTDUE", remove(ADDDATES(str(._TODAYSDATE),"10","0","0"),4,3))
+OBSNOW("TD BOOSTER", "Historical Tdap")
+return "TDAP given today, next due set for 10 years."}}{R()}
 
 oflu Orders Flu Vaccination Trivalent (Adult)
 
