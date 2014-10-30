@@ -42,6 +42,29 @@ IfWinNotExist, Update
 	Click, 13, %ypos%
 }
 return
+; Preventive Update, Assumes in Documents.
+#p::
+Send ^j
+WinWaitActive, Append to
+Send !F
+WinWaitActive, Append Document
+Send Clin
+Send {Down 4}{Enter}
+WinWaitActive, Update
+Send +{F8}
+Sleep, 100
+Send ^{PgDn}
+return
+; Replies with Web Message. Assumes in Documents.
+#r::
+Send ^j
+WinWaitActive, Append to
+Send !F
+WinWaitActive, Append Document
+Send Web{Enter}
+WinWaitActive, Update
+Send +{F8}
+return
 
 #IfWinActive, Centricity Practice Solution Browser:
 \::
