@@ -65,6 +65,16 @@ Send Web{Enter}
 WinWaitActive, Update
 Send +{F8}
 return
+; CPOE Append. Assumes in Documents.
+#c::
+Send ^j
+WinWaitActive, Append to
+Send !F
+WinWaitActive, Append Document
+Send CPOE{Enter}
+WinWaitActive, Update
+Send +{F8}
+return
 
 #IfWinActive, Centricity Practice Solution Browser:
 \::
