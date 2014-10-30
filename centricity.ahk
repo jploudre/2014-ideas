@@ -84,22 +84,22 @@ IfWinActive, Chart
 {
 Click, 62, 522
 WinWaitActive, Patient Registration
-Sleep, 50
+Sleep, 200
 MouseClickDrag, Left, 677, 374, 472, 374
 Send {Delete}
-Sleep, 50
+Sleep, 200
 MouseClickDrag, Left, 677, 491, 472, 491
 Send {Delete}
-Sleep, 50
+Sleep, 200
 Click, 635 678
-Sleep, 100
+Sleep, 200
 WinWaitActive, Centricity Practice,, 1
 if (ErrorLevel != 1) 
 {
  Send, n   
  WinWaitNotActive, Centricity
 }
-Sleep, 100
+Sleep, 200
 Send ^f
 }
 return
