@@ -1,5 +1,5 @@
 CoordMode, Mouse, Window
-SetKeyDelay, 20
+SetKeyDelay, 30
 return
 
 <#Esc::run taskmgr.exe
@@ -77,6 +77,32 @@ return
 
 ; End of Window Specific Hotkeys. 
 #IfWinActive
+
+F2::
+; Assumes in Patient Chart
+IfWinActive, Chart
+{
+Click, 62, 522
+WinWaitActive, Patient Registration
+Sleep, 50
+MouseClickDrag, Left, 677, 374, 472, 374
+Send {Delete}
+Sleep, 50
+MouseClickDrag, Left, 677, 491, 472, 491
+Send {Delete}
+Sleep, 50
+Click, 635 678
+Sleep, 100
+WinWaitActive, Centricity Practice,, 1
+if (ErrorLevel != 1) 
+{
+ Send, n   
+ WinWaitNotActive, Centricity
+}
+Sleep, 100
+Send ^f
+}
+return
 
 F10::
 ; Send a patient a blank letter
@@ -497,11 +523,15 @@ KeyPressPattern(length = 2, period = 0.2)
 ::3xbp:: Average of 3 automated readings with 60 second pause between readings.
 ::3bp:: 3 blood pressures were measured 1 minute apart and averaged.
 ::ujkp::
-Send Upcoming Appointment. ............................ Jonathan Ploudre, MD. %A_MMM% %A_DD%, %A_YYYY%
+text := "Upcoming Appointment. ............................ Jonathan Ploudre, MD. " . A_MMM . " " . A_DD . ", " A_YYYY
+clip(text)
+sleep 100
 Send !s
 return
 ::sljkp::
-Send Send Letter with results. ............................ Jonathan Ploudre, MD. %A_MMM% %A_DD%, %A_YYYY%
+text := "Send Letter with Results. ............................ Jonathan Ploudre, MD. " . A_MMM . " " . A_DD . ", " A_YYYY
+clip(text)
+sleep 100
 Send !s
 return
 ::cdn::
@@ -511,5 +541,6 @@ return
 Send SITUATION:{Enter 3}BACKGROUND:{Enter 3}ASSESSMENT:{Enter 3}RECOMENDATION:{Enter 2}{Up 10}
 return
 ::sdjkp::
-Send /JKP %A_MMM% %A_DD%, %A_YYYY%
+text := "............................ Jonathan Ploudre, MD. " . A_MMM . " " . A_DD . ", " A_YYYY
+clip(text)
 return
