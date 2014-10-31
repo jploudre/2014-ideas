@@ -44,12 +44,8 @@ IfWinNotExist, Update
 return
 ; Preventive Update, Assumes in Documents.
 #p::
-Send ^j
-WinWaitActive, Append to
-Send !F
-WinWaitActive, Append Document
-Send Clin
-Send {Down 4}{Enter}
+Gosub, OpenAppendType
+Send Clin{Down 4}{Enter}
 WinWaitActive, Update
 Send +{F8}
 Sleep, 100
@@ -57,20 +53,14 @@ Send ^{PgDn}
 return
 ; Replies with Web Message. Assumes in Documents.
 #r::
-Send ^j
-WinWaitActive, Append to
-Send !F
-WinWaitActive, Append Document
+Gosub, OpenAppendType
 Send Web{Enter}
 WinWaitActive, Update
 Send +{F8}
 return
 ; CPOE Append. Assumes in Documents.
 #c::
-Send ^j
-WinWaitActive, Append to
-Send !F
-WinWaitActive, Append Document
+Gosub, OpenAppendType
 Send CPOE{Enter}
 WinWaitActive, Update
 Send +{F8}
@@ -279,6 +269,12 @@ UpdateProblemsRemove:
 Click, 508, 572
 WinWaitNotActive
 Send {Enter}
+return
+OpenAppendType:
+Send ^j
+WinWaitActive, Append to
+Send !F
+WinWaitActive, Append Document
 return
 
 ; Downloaded Functions ----------------------------------------------------------------------------------
