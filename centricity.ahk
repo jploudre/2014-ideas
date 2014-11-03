@@ -238,7 +238,7 @@ IfWinActive, End Update
 	Click, 316, 351
 	WinWaitNotActive
 	Sleep, 200
-	SendInput Freeman{Enter}
+	SendInput Gaylor{Enter}
 	Sleep, 200
 	Click, 240, 345
 	WinWaitNotActive
