@@ -144,8 +144,6 @@ Send !F
 WinWaitActive, Append Document
 return
 
-; Downloaded Functions ----------------------------------------------------------------------------------
-
 ; http://www.autohotkey.com/board/topic/66855-patternhotkey-map-shortlong-keypress-patterns-to-anything/?hl=%2Bpatternhotkey
 
 ;         "pattern:keys"                  ; Maps pattern to send keys
