@@ -2,23 +2,62 @@
 #NoEnv
 #MaxThreadsBuffer On
 #SingleInstance, Force
-FileRead, paplist, papsmear.csv
+; Main Variables: PatientName, PapSmearDate & LineNum (from papsmear.csv)
 return
 
 
 F1::
-; Loop, parse, paplist, `n, `r
-; loop, parse, A_Loopfield, CSV
-
-; FindbyName()
-; ShowNameDOB()
+PatientName = GetPatientName.(LineNum)
+PapSmearDate = GetPapSmearDate(LineNum)
+FindbyName(PatientName)
 ; Open Chart()
 ; ReviewPap()
-; OpenPreventiveUpdate()
+OpenPreventiveUpdate()
 ; AddPapInfo()
 ; SignAndContinue()
-
 return
+
+GetPatientName(LineNum){
+FileReadLine, PaptoEnter, papsmear.csv, LineNum
+; loop, parse, A_Loopfield, CSV
+
+}
+
+FindbyName(){
+global 
+
+Send ^f
+WinWaitActive, Find Patient
+WaitforCitrix()
+Send 
+}
+
+
+OpenPreventiveUpdate(){
+; Assumes Pap Document is selected
+Send ^j
+WinWaitActive, Append to
+WaitforCitrix()
+Send !F
+WinWaitActive, Append Document
+WaitforCitrix()
+Send Clin{Down 4}{Enter}
+WinWaitActive, Update
+WaitforCitrix()
+; Swtich from Text to Template View
+Send +{F8}
+WaitforCitrix()
+Send ^{PgDn}
+WaitforCitrix()
+}
+
+
+
+
+WaitforCitrix(){
+; Additional Pauses to account for Interface Lag
+Sleep, 100
+}
 
 /* CSV reading example
 F10::
