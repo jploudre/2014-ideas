@@ -1,37 +1,67 @@
-
-#NoEnv
-#MaxThreadsBuffer On
-#SingleInstance, Force
-; Main Variables: PatientName, PapSmearDate & LineNum (from papsmear.csv)
-return
-
-
 F1::
-PatientName = GetPatientName.(LineNum)
-PapSmearDate = GetPapSmearDate(LineNum)
-FindbyName(PatientName)
-; Open Chart()
-; ReviewPap()
-OpenPreventiveUpdate()
-; AddPapInfo()
-; SignAndContinue()
-return
+; Read CSV by line and parse for Patient Name and Pap Date
+Loop, read, papsmear.csv
+{
+    LineNum = %A_Index%
+    Loop, parse, A_LoopReadLine, CSV
+    {
+        ; Column 1 Has Date
+        if (%A_Index% = 1){
+        PapSmearDate = %A_LoopField%
+        }
+        ; And 3 has Pt Name
+        if (%A_Index% = 3){
+        PatientName = %A_LoopField%
+        }
+    }
+    FindbyName(PatientName)
+    OpenChart()
+    ReviewPap(PatientName, PapSmearDate)
+    OpenPreventiveUpdate()
+    AddPapInfo(PatientName, PapSmearDate)
+    ; SignAndContinue()
+}
 
-GetPatientName(LineNum){
-FileReadLine, PaptoEnter, papsmear.csv, LineNum
-; loop, parse, A_Loopfield, CSV
+
+return
 
 }
 
-FindbyName(){
-global 
-
+FindbyName(PatientName){
 Send ^f
 WinWaitActive, Find Patient
 WaitforCitrix()
-Send 
+Send %PatientName%
+Send {Enter}
 }
 
+OpenChart(){
+; Assumes we're in Find Patient Dialog
+; Need to check if there are duplicate names
+; If there are no black pixels on the second line, there's only one.
+
+PixelSearch, , , X1, Y1, X2, Y2, ####Black , 3, Fast
+if Errorlevel {
+; No other names, so Open
+Send {Enter}
+} else {
+; Wait for Person to select a name
+WinWaitNotActive, Find Patient
+}
+}
+
+ReviewPap(PatientName, PapSmearDate){
+; Try to bring Pap on screen
+ToolTip, Select Pap from %PapSmearDate%`nThen hit 'F1', 100, 150
+; Go to Documents, Labs
+
+; If Date is > 2 years, look for red to double click
+; Scroll 3x looking for red with pixelsearch
+
+; Wait for F1 Key
+
+Tooltip ; removes tool tip
+}
 
 OpenPreventiveUpdate(){
 ; Assumes Pap Document is selected
@@ -51,50 +81,18 @@ Send ^{PgDn}
 WaitforCitrix()
 }
 
+AddPapInfo(PatientName, PapSmearDate){
+ToolTip, Pap Date %PapSmearDate%`nThen hit 'F1', 100, 150
 
+; Wait for F1
 
+Tooltip
+}
 
 WaitforCitrix(){
 ; Additional Pauses to account for Interface Lag
 Sleep, 100
 }
-
-/* CSV reading example
-F10::
-FileRead, preventative_recs, %A_Temp%\preventative_spreadsheet.csv
-Loop, parse, preventative_recs, `n, `r
-{
-    if (a_Index = 1) {
-        loop, parse, A_Loopfield, CSV
-        {
-        Array%A_Index% := A_Loopfield
-        }
-    }
-    ; First column is for searching, not a checkbox. Skip
-    IfNotInString, A_Loopfield, %agesex% 
-    {
-        continue
-    }
-    
-    ; Loop through preventative items
-    loop, parse, A_Loopfield, CSV
-    {
-        if (a_index = 1) {
-        continue    
-        }
-        ; Section Titles
-        makesectiontitle(2,"Daily Living")
-        makesectiontitle(7,"Shots")
-        makesectiontitle(9,"Heart Healthy")
-        makesectiontitle(14,"Testing")
-        
-        ; Checkboxes
-        makecheckbox(A_Index,array%A_index%,A_LoopField)
-    }
-}
-return
-*/
-
 
 
 
