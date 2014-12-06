@@ -6,9 +6,9 @@ Loop, read, papsmear.csv
     Loop, parse, A_LoopReadLine, CSV
     {
         ; Column 1, Date; Column 3, Name
-        if (%A_Index% = 1)
+        if (A_Index = 1)
         PapSmearDate = %A_LoopField%
-        if (%A_Index% = 3)
+        if (A_Index = 3)
         PatientName = %A_LoopField%
     }
     FindPatient(PatientName)
@@ -33,6 +33,7 @@ Send %PatientName%{Enter}
     ; Wait for someone to select a name
     WinWaitNotActive, Find Patient
     }
+    WaitforCitrix()
 }
 
 ReviewPap(PatientName, PapSmearDate){
@@ -89,7 +90,7 @@ Click, 13, %ypos%
 
 WaitforCitrix(){
 ; Additional Pauses to account for Interface Lag
-Sleep, 100
+Sleep, 1000
 }
 
 
