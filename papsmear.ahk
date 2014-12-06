@@ -1,27 +1,24 @@
-F1::
+F12::
+; Assumes in Desktop. papsmear.csv in same folder. 
 ; Read CSV by line and parse for Patient Name and Pap Date
 Loop, read, papsmear.csv
 {
     Loop, parse, A_LoopReadLine, CSV
     {
-        ; Column 1 Has Date
-        if (%A_Index% = 1){
+        ; Column 1, Date; Column 3, Name
+        if (%A_Index% = 1)
         PapSmearDate = %A_LoopField%
-        }
-        ; And 3 has Pt Name
-        if (%A_Index% = 3){
+        if (%A_Index% = 3)
         PatientName = %A_LoopField%
-        }
     }
     FindbyName(PatientName)
     OpenChart()
     ReviewPap(PatientName, PapSmearDate)
     OpenPreventiveUpdate()
     AddPapInfo(PatientName, PapSmearDate)
-    ; SignAndContinue()
+    SignAndContinue()
 }
 return
-}
 
 FindbyName(PatientName){
 Send ^f
@@ -33,11 +30,9 @@ Send {Enter}
 
 OpenChart(){
 ; Assumes we're in Find Patient Dialog
-; Need to check if there are duplicate names
-; If there are no black pixels on the second line, there's only one.
+; Check for duplicate names (black pixels on second line.
     ; PixelSearch, , , X1, Y1, X2, Y2, ####Black , 3, Fast
     if Errorlevel {
-    ; No other names, so Open
     Send {Enter}
     } else {
     ; Wait for Person to select a name
@@ -46,12 +41,10 @@ OpenChart(){
 }
 
 ReviewPap(PatientName, PapSmearDate){
-; Try to bring Pap on screen
+ToolTip, Select Pap on %PapSmearDate%`nThen hit 'F1', 100, 150
+; Could Try to bring Pap on screen
 ; Go to Documents, Labs
 ; If Date is > 2 years, look for red to double click
-; Scroll 3x looking for red with pixelsearch
-
-ToolTip, Select Pap from %PapSmearDate%`nThen hit 'F1', 100, 150
 
 ; Wait for F1 Key
 KeyWait, F1
@@ -78,10 +71,24 @@ WaitforCitrix()
 
 AddPapInfo(PatientName, PapSmearDate){
 ToolTip, Pap Date %PapSmearDate%`nThen hit 'F1', 100, 150
-
+; Could Auto-enter Pap Normal, and Date
 ; Wait for F1
 KeyWait, F1
 Tooltip
+}
+
+SignAndContinue(){
+; End/Sign
+Send, ^e
+WinWaitActive, End Update
+WaitforCitrix()
+Send, !s
+WinWaitNotActive, End Update
+WaitforCitrix()
+; Switch to Desktop
+WinGetPos,,,,winheight,A
+ypos := winheight - 161
+Click, 13, %ypos%
 }
 
 WaitforCitrix(){
