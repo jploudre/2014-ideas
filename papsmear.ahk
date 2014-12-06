@@ -2,7 +2,6 @@ F1::
 ; Read CSV by line and parse for Patient Name and Pap Date
 Loop, read, papsmear.csv
 {
-    LineNum = %A_Index%
     Loop, parse, A_LoopReadLine, CSV
     {
         ; Column 1 Has Date
@@ -21,10 +20,7 @@ Loop, read, papsmear.csv
     AddPapInfo(PatientName, PapSmearDate)
     ; SignAndContinue()
 }
-
-
 return
-
 }
 
 FindbyName(PatientName){
@@ -39,32 +35,32 @@ OpenChart(){
 ; Assumes we're in Find Patient Dialog
 ; Need to check if there are duplicate names
 ; If there are no black pixels on the second line, there's only one.
-
-PixelSearch, , , X1, Y1, X2, Y2, ####Black , 3, Fast
-if Errorlevel {
-; No other names, so Open
-Send {Enter}
-} else {
-; Wait for Person to select a name
-WinWaitNotActive, Find Patient
-}
+    ; PixelSearch, , , X1, Y1, X2, Y2, ####Black , 3, Fast
+    if Errorlevel {
+    ; No other names, so Open
+    Send {Enter}
+    } else {
+    ; Wait for Person to select a name
+    WinWaitNotActive, Find Patient
+    }
 }
 
 ReviewPap(PatientName, PapSmearDate){
 ; Try to bring Pap on screen
-ToolTip, Select Pap from %PapSmearDate%`nThen hit 'F1', 100, 150
 ; Go to Documents, Labs
-
 ; If Date is > 2 years, look for red to double click
 ; Scroll 3x looking for red with pixelsearch
 
-; Wait for F1 Key
+ToolTip, Select Pap from %PapSmearDate%`nThen hit 'F1', 100, 150
 
+; Wait for F1 Key
+KeyWait, F1
 Tooltip ; removes tool tip
 }
 
 OpenPreventiveUpdate(){
 ; Assumes Pap Document is selected
+; Opens Update using keyboard shortcuts.
 Send ^j
 WinWaitActive, Append to
 WaitforCitrix()
@@ -74,7 +70,6 @@ WaitforCitrix()
 Send Clin{Down 4}{Enter}
 WinWaitActive, Update
 WaitforCitrix()
-; Swtich from Text to Template View
 Send +{F8}
 WaitforCitrix()
 Send ^{PgDn}
@@ -85,7 +80,7 @@ AddPapInfo(PatientName, PapSmearDate){
 ToolTip, Pap Date %PapSmearDate%`nThen hit 'F1', 100, 150
 
 ; Wait for F1
-
+KeyWait, F1
 Tooltip
 }
 
