@@ -1,3 +1,5 @@
+; Setup
+{
 CoordMode, Mouse, Window
 SetKeyDelay, 30
 return
@@ -9,6 +11,8 @@ return
 RWin::return
 LWin::return
 #L::return
+
+}
 
 #IfWinActive, Update
 `::PatternHotKey(".->GotoChart","..->SwapTextView")
@@ -26,6 +30,17 @@ Rwin::
 #Space::
 Run unfocus.exe
 return
+F1::PatternHotKey(".->OrderSearch")
+F2::PatternHotKey(".->MedSearch", "..->UpdateMeds")
+F3::PatternHotKey(".->ProblemSearch", "..->UpdateProblems")
+F5::PatternHotKey(".->HPI")
+F6::PatternHotKey(".->Preventive", "..->CommittoFlowsheet")
+F7::PatternHotKey(".->PMH-SH-CCC", "..->InserttoNote")
+F8::PatternHotKey(".->ROS", "..->ROS2")
+F9::PatternHotKey(".->PE", "..->PE-URI")
+F10::PatternHotKey(".->CPOE", "..->AssessmentsDue")
+F11::PatternHotKey(".->PatientInstructions", "..->PrintVisitSummary")
+F12::PatternHotKey(".->Prescriptions", "..->SendPrescriptions")
 
 #IfWinActive, End Update
 \::PatternHotKey(".->HoldUpdate", "..->SendToBrandie")
@@ -101,6 +116,9 @@ return
 ; End of Window Specific Hotkeys. 
 #IfWinActive
 
+/*
+Function Key Functions.
+
 F2::
 ; Assumes in Patient Chart
 IfWinActive, Chart
@@ -127,8 +145,11 @@ Send ^f
 }
 return
 
+
+
 F10::
 ; Send a patient a blank letter
+{
 Send ^p
 Sleep 100
 Send l
@@ -144,7 +165,9 @@ Click, 241, 59
 Send B
 Sleep, 100
 Click, 392, 351
+}
 return
+*/
 
 ; Hyper-Space: I'm Done
 !#^+Space::
@@ -154,6 +177,8 @@ IfWinActive, End Update ; Holds Document
 	Click, 402, 515
 return
 
+; Gestures for MacBook Air
+{
 ; Hyper-Escape: Ruh-oh
 
 ; Shift Ctrl-a: Open Append
@@ -213,8 +238,14 @@ IfWinActive, Chart
 IfWinActive, End Update ; Signs Document
 	Click, 295, 515
 return
-
+}
 ; Functions
+
+CitrixSleep(){
+Sleep, 100
+}
+return
+
 GotoChart:
 WinActivate, Chart
 return
@@ -250,6 +281,127 @@ else
 return	
 }
 return
+
+; Centricity Update Hotkey Functions
+;#############################################################################
+
+OrderSearch:
+Click, 254, 38
+WinWaitActive, Update Orders
+CitrixSleep()
+Click, 253, 287
+CitrixSleep()
+Click 400, 330
+return
+
+MedSearch:
+Click, 320, 40
+WinWaitActive, New Medication
+Click, 706, 53
+WinWaitActive, Find Medication
+return
+
+UpdateMeds:
+FindTemplate("HPI-CCC.png")
+Click, 931, 585
+return
+
+ProblemSearch:
+Click, 407, 36
+WinWaitActive, New Problem
+Send !R
+return
+
+UpdateProblems:
+FindTemplate("HPI-CCC.png")
+Click, 841, 584
+return
+
+
+HPI:
+FindTemplate("HPI-CCC.png")
+Click, 767, 559
+return
+
+Preventive:
+FindTemplate("Preventive-Care-Screening.png")
+return
+
+CommittoFlowsheet:
+FindTemplate("Preventive-Care-Screening.png")
+Click, 599, 113
+return
+
+PMH-SH-CCC:
+FindTemplate("PMH-SH-CCC.png")
+return
+
+InserttoNote:
+FindTemplate("PMH-SH-CCC.png")
+Click, 921, 112
+return
+
+ROS:
+FindTemplate("ROS-CCC.png")
+return
+
+ROS2:
+FindTemplate("ROS-CCC.png")
+Click, 351, 80
+return
+
+PE:
+FindTemplate("PE-CCC.png")
+Click, 524, 203
+return
+
+PE-URI:
+FindTemplate("PE-CCC.png")
+Click, 524, 203
+Send xu{return}
+return
+
+CPOE:
+FindTemplate("CPOE-A&P-CCC.png")
+return
+
+AssessmentsDue:
+FindTemplate("CPOE-A&P-CCC.png")
+Click, 561, 108
+return
+
+PatientInstructions:
+FindTemplate("Patient-Instructions-CCC.png")
+Click, 594, 341
+return
+
+PrintVisitSummary:
+FindTemplate("Patient-Instructions-CCC.png")
+Click, 891, 130
+Click, 
+return
+
+Prescriptions:
+FindTemplate("Prescriptions.png")
+return
+
+SendPrescriptions:
+FindTemplate("Prescriptions.png")
+Click, 946. 563
+return
+
+FindTemplate(imagefile) {
+ImageSearch, FoundX, FoundY, 20, 170, 203, 536, *n10 %imagefile%
+if (ErrorLevel = 0) {
+MouseMove, %FoundX%, %FoundY%
+Click 2
+CitrixSleep()
+CitrixSleep()
+CitrixSleep()
+}
+}
+return
+
 
 ; Update Problems Functions
 

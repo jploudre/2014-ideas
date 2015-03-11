@@ -1,0 +1,7 @@
+{fn R() {
+a=getarg(1) b=getarg(2)
+MEL_ADD_PROBLEM('DX OF',a,b, str(._TODAYSDATE),ADDDATES(str(._TODAYSDATE),"0","10","0"))
+MEL_ADD_ORDER("S", "Laboratory", "82274 - Blood Occult iFob; COLORECTAL SCREENING**", "", "ICD-V76.51", "COLON CANCER SCREENING", "", "1", "N", "",str(._TODAYSDATE))
+DOCUMENT.TEMP_CCC_CPOE_PL_1=DOCUMENT.TEMP_CCC_PI_MLEF+a+" ("+b+")"
+MEL_SIGN_ORDERS()
+return ""}}{R ("COLON CANCER SCREENING","ICD-V76.51")} Notified normal letter. .......{USER.REALNAME}  {DATETIMESTAMP()}
