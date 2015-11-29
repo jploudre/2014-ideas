@@ -1,0 +1,16 @@
+{fn R() {local t, i
+a=getarg(1) b=getarg(2) c=getarg(3)
+if (DurationDays(LASTOBSDATE(a), str(._TODAYSDATE)) < 30)
+then t=a+":"
+for i=0, i<c , i=i+1
+do
+t=t+"\t"
+endfor
+t = t+LASTOBSVALUE(a)+" "+OBSUNIT(a)+"\t"+b+HRET
+endif
+}}
+{
+if (DurationDays(LASTOBSDATE("HDL"), str(._TODAYSDATE)) < 30)
+then "Lipid Panel ("+LASTOBSDATE("HDL")+")"+HRET+R("HDL","'Healthy' Cholesterol", "4")+R("Cholesterol","Total", "3")+R("LDL","'Bad' Cholesterol", "4")+R("Triglyceride","Other Blood Fat", "3")
+endif
+}
