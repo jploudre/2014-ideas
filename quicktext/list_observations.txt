@@ -1,0 +1,15 @@
+This quicktext is a template for listing the last 3 results for a patient. (Such as, the last 3 A1cs.)
+
+o observations array
+t text to return
+r observation row
+
+
+{fn LO(){local i, j, o=getfield(List_Obs("HDL","pencil","delimited","value")"delim"),"|",""), t
+for i=1, i < 4, i = i+1
+do
+r = getfield(o[i],"^","")
+t = t+r[1]+" "+ObsUnit("HDL")+"\t"+r[2]+HRET
+endfor
+return t
+}}{LO()}
