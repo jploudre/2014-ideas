@@ -4,8 +4,8 @@ o observations array
 t text to return
 r observation row
 
-{LObs("HDL")}
-{fn LObs(){local i, j, o=getfield(List_Obs(getarg(1),"signed","delimited","value"),"|",""), t=getarg(1)+" Trend"+HRET, r
+{LObs("HDL","HDL is 'Healthy' Cholesterol. Target: more than 40")}
+{fn LObs(){local i, j, o=getfield(List_Obs(getarg(1),"signed","delimited","value"),"|",""), t=getarg(2)+HRET, r
 j = Size(o)+1
 if j=1, return ""
 for i=1, i < j, i=i+1
