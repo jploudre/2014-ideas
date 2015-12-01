@@ -4,13 +4,13 @@ o observations array
 t text to return
 r observation row
 
-{fn LObs(){local i, j, o=getfield(List_Obs("HDL","signed","delimited","value"),"|",""), t="HDL Trend"+HRET, r
+{LObs("HDL")}
+{fn LObs(){local i, j, o=getfield(List_Obs(getarg(1),"signed","delimited","value"),"|",""), t=getarg(1)+" Trend"+HRET, r
 j = Size(o)+1
 for i=1, i < j, i=i+1
 do
 r=getfield(o[i],"^","")
-t=t+r[1]+" "+ObsUnit("HDL")+"\t"+r[2]+HRET
+t=t+r[1]+" "+ObsUnit(getarg(1))+"\t"+r[2]+HRET
 endfor
 return t
 }}
-{LObs()}
