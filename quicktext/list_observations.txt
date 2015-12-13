@@ -1,58 +1,15 @@
 {fn LObs(){local i, j, o=getfield(List_Obs(getarg(1),"signed","delimited","value"),"|",""), t=getarg(2)+HRET, r
 j = Size(o)+1
+if j=1 then
+endif
 for i=1, i < j, i=i+1
 do
+if i=6 then
+return t
+endif
 r=getfield(o[i],"^","")
 t=t+"  "+r[1]+" "+ObsUnit(getarg(1))+"\t"+r[2]+HRET
 endfor
 return t
 }}
-{LObs("HDL","HDL is 'Healthy' Cholesterol. Target: more than 40")}
-
-
-
-{fn LObs(){local i, j, o=getfield(List_Obs(getarg(1),"signed","delimited","value"),"|",""), t=getarg(2)+HRET, r
-j = Size(o)+1
-for i=1, i < j, i=i+1
-do
-r=getfield(o[i],"^","")
-t=t+r[1]+" "+ObsUnit(getarg(1))+"\t"+r[2]+HRET
-endfor
-return t
-}}
-{LObs("HDL","HDL is 'Healthy' Cholesterol. Target: more than 40")}
-
-
-
-{LObs("HDL","HDL is 'Healthy' Cholesterol. Goal over 40")}
-{fn LObs(){local i, j, o=getfield(List_Obs(getarg(1),"signed","delimited","value"),"|",""), t=getarg(2)+HRET, r
-j = Size(o)+1
-for i=1, i < j, i=i+1
-do
-r=getfield(o[i],"^","")
-t=t+"\t"+r[1]+" "+ObsUnit(getarg(1))+"\t"+r[2]+HRET
-endfor
-return t
-}}
-
-{LObs("HDL")}
-{fn LObs(){local i, j, o=getfield(List_Obs(getarg(1),"signed","delimited","value"),"|",""), t=getarg(1)+" Trend"+HRET, r
-j = Size(o)+1
-for i=1, i < j, i=i+1
-do
-r=getfield(o[i],"^","")
-t=t+r[1]+" "+ObsUnit(getarg(1))+"\t"+r[2]+HRET
-endfor
-return t
-}}
-
-{fn LObs(){local i, j, o=getfield(List_Obs(getarg(1),"signed","delimited","value"),"|",""), t="HDL Trend"+HRET, r
-j = Size(o)+1
-for i=1, i < j, i=i+1
-do
-r=getfield(o[i],"^","")
-t=t+r[1]+" "+ObsUnit("HDL")+"\t"+r[2]+HRET
-endfor
-return t
-}}
-{LObs("HDL","HDL is 'Healthy' Cholesterol. Target: more than 40")}
+{LObs("HDL","HDL is 'Healthy' Cholesterol. Target: over 40")}
