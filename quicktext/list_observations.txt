@@ -1,6 +1,7 @@
 {fn LObs(){local i, j, o=getfield(List_Obs(getarg(1),"signed","delimited","value"),"|",""), t=getarg(2)+HRET, r
 j = Size(o)+1
 if j=1 then
+return ""
 endif
 for i=1, i < j, i=i+1
 do
