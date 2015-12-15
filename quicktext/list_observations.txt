@@ -1,3 +1,24 @@
+;recent
+
+{fn R() {local t, i a=getarg(1) b=getarg(2) c=getarg(3)
+if (DurationDays(LASTOBSDATE(a), str(._TODAYSDATE)) < 30)
+then t="  "+a+":"
+for i=0, i<c , i=i+1
+do
+t=t+"\t"
+endfor
+t = t+LASTOBSVALUE(a)+" "+OBSUNIT(a)+"\t"+b+HRET
+endif
+}}
+
+;recent title
+{fn RT() {a=getarg(1) b=getarg(2)
+if (DurationDays(LASTOBSDATE(a), str(._TODAYSDATE)) < 30),
+return b
+}}  
+
+;tr (trends)
+
 {fn LObs(){local i, j, o=getfield(List_Obs(getarg(1),"signed","delimited","value"),"|",""), t=getarg(2)+HRET, r
 j = Size(o)+1
 if j=1 then
@@ -13,4 +34,3 @@ t=t+"  "+r[1]+" "+ObsUnit(getarg(1))+"\t"+r[2]+HRET
 endfor
 return t
 }}
-{LObs("HDL","HDL is 'Healthy' Cholesterol. Target: over 40")}
