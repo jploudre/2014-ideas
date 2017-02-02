@@ -1,0 +1,10 @@
+Capitalize All Problems
+
+{fn Prob() {local t, i, probs = getfield(Prob_Active(),"\r","")
+for i=1, i < size(probs), i = i+1
+do
+t = t+HRET+InitialCap(str(probs[i]))
+endfor
+return t
+}}{Prob()}
+
