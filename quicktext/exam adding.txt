@@ -6,6 +6,16 @@ template = str("DOCUMENT.TEMP_CCC_PE_MLEF_",toupper(system),"=P(\"", system, "\"
 eval(template)
 return ""}}
 {Exam("Gen")}
+{Exam("Eyes")}
+{Exam("Ears")}
+{Exam("Nose")}
+{Exam("Mouth")}
+{Exam("Neck")}
+{Exam("Lungs")}
+{Exam("Heart")}
+{Exam("Cerv_Node")}
+{Exam("Psych")}
+
 
 DOCUMENT.TEMP_CCC_PE_MLEF_GEN=""
 DOCUMENT.TEMP_CCC_PE_MLEF_HEAD=""
@@ -34,3 +44,5 @@ DOCUMENT.TEMP_CCC_PE_MLEF_CERV_NODE=""
 DOCUMENT.TEMP_CCC_PE_MLEF_AXILLARY_NODE=""
 DOCUMENT.TEMP_CCC_PE_MLEF_ING_NODE=""
 DOCUMENT.TEMP_CCC_PE_MLEF_PSYCH=“"
+
+
